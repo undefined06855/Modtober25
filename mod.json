@@ -1,0 +1,20 @@
+{
+    "geode": "4.8.0",
+    "gd": {
+        "win": "2.2074",
+        "android": "2.2074",
+        "mac": "2.2074",
+        "ios": "2.2074"
+    },
+
+    "version": "v1.0.0",
+    "id": "undefined0.icon_kit",
+    "name": "\"\"Icon\"\" Kit",
+    "developer": "undefined0",
+    "description": "Allows you to select any icon type for any gamemode!",
+    "tags": [],
+
+    "links": {
+        "source": "https://github.com/undefined06855/example-mod"
+    }
+}

@@ -8,7 +8,7 @@ else()
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
 
-project(\"\"Icon\"\"Kit VERSION 1.0.0)
+project(IconKit VERSION 1.0.0)
 
 file(GLOB_RECURSE SOURCES
     src/*.cpp

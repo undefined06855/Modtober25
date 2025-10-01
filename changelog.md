@@ -1,3 +1,3 @@
-# Example Mod
+# ""Icon"" Kit
 ## v1.0.0
 - Initial release

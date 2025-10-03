@@ -14,10 +14,6 @@
     "description": "Allows you to select any icon type for any gamemode!",
     "tags": [ "modtober25", "gameplay", "joke" ],
 
-    "dependencies": {
-        "geode.node-ids": "v1.21.0"
-    },
-
     "resources": {
         "sprites": [ "resources/*.png" ]
     },

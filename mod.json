@@ -1,5 +1,5 @@
 {
-    "geode": "4.8.0",
+    "geode": "4.9.0",
     "gd": {
         "win": "2.2074",
         "android": "2.2074",
@@ -12,9 +12,17 @@
     "name": "\"\"Icon\"\" Kit",
     "developer": "undefined0",
     "description": "Allows you to select any icon type for any gamemode!",
-    "tags": [],
+    "tags": [ "modtober25", "gameplay", "joke" ],
+
+    "dependencies": {
+        "geode.node-ids": "v1.21.0"
+    },
+
+    "resources": {
+        "sprites": [ "resources/*.png" ]
+    },
 
     "links": {
-        "source": "https://github.com/undefined06855/example-mod"
+        "source": "https://github.com/undefined06855/Modtober25"
     }
 }

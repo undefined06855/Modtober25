@@ -10,7 +10,12 @@ FunnySpriteManager::FunnySpriteManager()
     , m_robot(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
     , m_spider(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
     , m_swing(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_jetpack(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE) {}
+    , m_jetpack(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
+
+    , m_mappingShader(nullptr)
+
+    , m_wantsRealCountForType(false)
+    , m_totalCountForTypes(0) {}
 
 FunnySpriteManager& FunnySpriteManager::get() {
     static FunnySpriteManager instance;
@@ -65,7 +70,7 @@ void FunnySpriteManager::init() {
     cache->addImage("mapping-swing.png"_spr, false);
     cache->addImage("mapping-jetpack.png"_spr, false);
 
-    // and create shader
+    // create shader
     m_mappingShader = new cocos2d::CCGLProgram;
     bool ret = m_mappingShader->initWithVertexShaderByteArray(g_mappingShaderVertex, g_mappingShaderFragment);
     if (!ret) {
@@ -87,6 +92,74 @@ void FunnySpriteManager::init() {
     m_mappingShader->setUniformLocationWith1i(m_mappingShader->getUniformLocationForName("CC_Texture1"), 1);
 
     updateRenderedSprites();
+
+    // get total count for types
+    for (int i = fmt::underlying(IconType::Cube); i <= fmt::underlying(IconType::Jetpack); i++) {
+        m_totalCountForTypes += realCountForType((IconType)i);
+    }
+
+    // set m_icon
+    if (geode::Mod::get()->hasSavedValue("icons")) {
+        // get from mod config
+        auto array = geode::Mod::get()->getSavedValue<matjson::Value>("icons").asArray().unwrapOrDefault();
+        for (int i = 0; i < array.size(); i++) {
+            int index = array[i]["index"].asUInt().unwrapOr(0);
+            auto ofIconType = (IconType)array[i]["of"].asUInt().unwrapOr(0);
+
+            m_icon[(IconType)i] = IconChoiceInfo{
+                .m_index = index,
+                .m_ofIconType = ofIconType
+            };
+        }
+    } else {
+        // get from save data
+        for (IconType i = IconType::Cube; fmt::underlying(i) <= fmt::underlying(IconType::Jetpack); i = (IconType)(fmt::underlying(i) + 1)) {
+            m_icon[i] = IconChoiceInfo{
+                .m_index = GameManager::get()->activeIconForType(i),
+                .m_ofIconType = i
+            };
+        }
+
+        saveIconChoice();
+    }
+
+    // create m_icons
+    for (IconType i = IconType::Cube; fmt::underlying(i) <= fmt::underlying(IconType::Jetpack); i = (IconType)(fmt::underlying(i) + 1)) {
+        m_iconsForIconType[i] = {};
+
+        // first, add all icons for this icon type in the vanilla game
+        for (int j = 0; j < realCountForType(i); j++) {
+            m_iconsForIconType[i].push_back({
+                .m_type = i,
+                .m_index = j + 1
+            });
+        }
+
+        // then, add all icons for the rest of the icon types, skipping i
+        for (IconType j = IconType::Cube; fmt::underlying(j) <= fmt::underlying(IconType::Jetpack); j = (IconType)(fmt::underlying(j) + 1)) {
+            if (j == i) continue;
+
+            for (int k = 0; k < realCountForType(j); k++) {
+                m_iconsForIconType[i].push_back({
+                    .m_type = j,
+                    .m_index = k + 1
+                });
+            }
+        }
+    }
+}
+
+void FunnySpriteManager::saveIconChoice() {
+    auto array = matjson::Value(std::vector<matjson::Value>{});
+
+    for (auto& [type, info] : m_icon) {
+        array[fmt::underlying(type)] = matjson::makeObject({
+            { "index", info.m_index },
+            { "of", fmt::underlying(info.m_ofIconType) }
+        });
+    }
+
+    geode::Mod::get()->setSavedValue("icons", array);
 }
 
 void FunnySpriteManager::updateRenderedSprites() {
@@ -103,15 +176,11 @@ void FunnySpriteManager::updateRenderedSprites() {
 
 void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode) {
     auto simplePlayer = SimplePlayer::create(0);
+    auto playerSprite = simplePlayer->getChildrenExt()[0];
 
-    int frame = -1;
     auto gameManager = GameManager::get();
 
-    // TODO: make this what the player selects in the extended icon kit
-    frame = gameManager->getPlayerShip();
-    auto selectedGamemode = IconType::Ship;
-
-    simplePlayer->updatePlayerFrame(frame, selectedGamemode);
+    simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_ofIconType);
     simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
     simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
     simplePlayer->setGlowOutline(gameManager->colorForIdx(gameManager->getPlayerGlowColor()));
@@ -121,11 +190,53 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     // something the same size as the screen ?
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     simplePlayer->setPosition(winSize / 2.f);
-    simplePlayer->setScaleX(winSize.width / 32.f);
-    simplePlayer->setScaleY(winSize.height / 32.f);
+    simplePlayer->setScaleX(winSize.width / playerSprite->getContentWidth());
+    simplePlayer->setScaleY(winSize.height / playerSprite->getContentHeight());
 
     renderTexture.capture(simplePlayer);
     simplePlayer->release();
+}
+
+int FunnySpriteManager::realCountForType(IconType type) {
+    m_wantsRealCountForType = true;
+    auto ret = GameManager::get()->countForType(type);
+    m_wantsRealCountForType = false;
+
+    return ret;
+}
+
+int FunnySpriteManager::currentIconIndexInTermsOf(IconType type, IconType typeInTermsOf) {
+    if (!m_icon.contains(type)) return -1;
+
+    auto& info = m_icon[type];
+
+    if (info.m_ofIconType == typeInTermsOf) return info.m_index;
+    else return -1;
+}
+
+CCMenuItemSpriteExtra* FunnySpriteManager::getIcon(UnloadedSingleIconInfo info, GJGarageLayer* target) {
+    // copied from GJGarageLayer::getItems
+    // there's something to do with playerSquare_001.png that i have no idea about
+
+    auto unlockType = GameManager::get()->iconTypeToUnlockType(info.m_type);
+
+    auto item = GJItemIcon::createBrowserItem(unlockType, info.m_index);
+    auto scale = item->scaleForType(unlockType);
+    item->setScale(scale);
+
+    auto btn = CCMenuItemSpriteExtra::create(item, target, menu_selector(GJGarageLayer::onSelect));
+    btn->setTag(info.m_index);
+    btn->m_iconType = info.m_type; // this is really good for us actually
+
+    // not in decomp but will make it match visually (not sure where these are from)
+    btn->setContentSize({ 30.f, 30.f });
+    item->setPosition({ 15.f, 15.f });
+
+    if (!GameManager::get()->isIconUnlocked(info.m_index, info.m_type)) {
+        item->changeToLockedState(1.f / scale);
+    }
+
+    return btn;
 }
 
 $on_mod(Loaded) {

@@ -1,4 +1,5 @@
 #include "PlayerObject.hpp"
+#include "../FunnySpriteManager.hpp"
 
 void FakeSpriteBatchNode::draw() { CCNode::draw(); }
 void FakeSpriteBatchNode::visit() { CCNode::visit(); }
@@ -7,8 +8,11 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     if (!PlayerObject::init(player, ship, gameLayer, layer, playLayer)) return false;
     if (!gameLayer) return true;
 
+    FunnySpriteManager::get().updateRenderedSprites();
+
     // TODO: starting a level as a non-cube gamemode uses cube mapping
     // TODO: restarting a level as spider/robot doesn't make sprite visible again
+    // TODO: player trail still default
 
     auto fields = m_fields.self();
 

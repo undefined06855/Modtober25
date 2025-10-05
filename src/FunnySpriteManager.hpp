@@ -4,7 +4,7 @@
 
 struct IconChoiceInfo {
     int m_index;
-    IconType m_ofIconType;
+    IconType m_iconType;
 };
 
 struct UnloadedSingleIconInfo {
@@ -35,23 +35,21 @@ public:
 
     std::unordered_map<IconType, IconChoiceInfo> m_icon;
 
-    cocos2d::CCGLProgram* m_mappingShader;
-
     bool m_wantsRealCountForType;
     int m_totalCountForTypes;
 
-    std::unordered_map<IconType, std::vector<UnloadedSingleIconInfo>> m_iconsForIconType = {};
+    std::unordered_map<IconType, std::vector<UnloadedSingleIconInfo>> m_iconsForIconType;
 
     void init();
     void updateRenderedSprites();
     void updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode);
 
+    cocos2d::CCGLProgram* getMappingShader();
+
     GLuint textureForGamemode(FunnySpriteGamemode gamemode);
     GLuint mappingTextureForGamemode(FunnySpriteGamemode gamemode);
 
     int realCountForType(IconType type);
-
-    int currentIconIndexInTermsOf(IconType type, IconType typeInTermsOf);
 
     void saveIconChoice();
 

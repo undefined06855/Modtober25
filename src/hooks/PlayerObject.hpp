@@ -5,8 +5,8 @@
 // see HookedPlayerObject::patchBatchNode
 class FakeSpriteBatchNode : public cocos2d::CCSpriteBatchNode {
 public:
-    virtual void draw() override;
-    virtual void visit() override;
+    void draw();
+    void visit();
 };
 
 class $modify(HookedPlayerObject, PlayerObject) {
@@ -23,7 +23,7 @@ class $modify(HookedPlayerObject, PlayerObject) {
     void createRobot(int frame);
     void createSpider(int frame);
 
-    void update(float dt) override;
+    void update(float dt);
 
     void patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode);
 };

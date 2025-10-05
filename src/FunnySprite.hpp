@@ -5,6 +5,7 @@ struct GamemodeInfo {
     cocos2d::CCPoint m_offset;
 };
 
+// make sure the first 9 are the same as IconType
 enum class FunnySpriteGamemode {
     Cube, Ship, Ball, Ufo, Wave, Robot, Spider, Swing, Jetpack,
     CubePassenger
@@ -12,14 +13,14 @@ enum class FunnySpriteGamemode {
 
 class FunnySprite : public cocos2d::CCSprite {
 public:
-    static FunnySprite* create(PlayerObject* playerObject);
-    bool init(PlayerObject* playerObject);
+    static FunnySprite* create();
+    bool init();
 
-    PlayerObject* m_playerObject;
     GLuint m_currentTexture;
     GLuint m_currentMappingTexture;
 
-    virtual void updateForGamemode(FunnySpriteGamemode gamemode);
+    void updateForGamemode(FunnySpriteGamemode gamemode);
+    void updateForGamemode(IconType gamemode);
 
-    virtual void draw() override;
+    void draw();
 };

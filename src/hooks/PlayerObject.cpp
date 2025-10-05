@@ -1,14 +1,11 @@
 #include "PlayerObject.hpp"
-#include "../FunnySpriteManager.hpp"
 
 void FakeSpriteBatchNode::draw() { CCNode::draw(); }
 void FakeSpriteBatchNode::visit() { CCNode::visit(); }
 
 bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, cocos2d::CCLayer* layer, bool playLayer) {
     if (!PlayerObject::init(player, ship, gameLayer, layer, playLayer)) return false;
-    if (!gameLayer) return true;
-
-    FunnySpriteManager::get().updateRenderedSprites();
+    if (!gameLayer) return true; // menu icon (check repeated in other functions)
 
     // TODO: starting a level as a non-cube gamemode uses cube mapping
     // TODO: restarting a level as spider/robot doesn't make sprite visible again
@@ -16,13 +13,13 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
 
     auto fields = m_fields.self();
 
-    auto funnySprite = FunnySprite::create(this);
+    auto funnySprite = FunnySprite::create();
     funnySprite->updateForGamemode(FunnySpriteGamemode::Cube);
     funnySprite->setZOrder(1);
     m_mainLayer->addChild(funnySprite);
     fields->m_funnySprite = funnySprite;
 
-    auto funnyVehicleSprite = FunnySprite::create(this);
+    auto funnyVehicleSprite = FunnySprite::create();
     funnyVehicleSprite->updateForGamemode(FunnySpriteGamemode::Ship);
     funnyVehicleSprite->setZOrder(2);
     funnyVehicleSprite->setVisible(false);
@@ -102,7 +99,7 @@ void HookedPlayerObject::createRobot(int frame) {
 
     if (m_robotSprite->m_paSprite->getChildByType<FunnySprite>(0)) return;
 
-    auto funnySprite = FunnySprite::create(this);
+    auto funnySprite = FunnySprite::create();
     funnySprite->updateForGamemode(FunnySpriteGamemode::Robot);
     funnySprite->setZOrder(3);
     m_robotSprite->m_paSprite->addChild(funnySprite);
@@ -117,7 +114,7 @@ void HookedPlayerObject::createSpider(int frame) {
 
     if (m_spiderSprite->m_paSprite->getChildByType<FunnySprite>(0)) return;
 
-    auto funnySprite = FunnySprite::create(this);
+    auto funnySprite = FunnySprite::create();
     funnySprite->updateForGamemode(FunnySpriteGamemode::Spider);
     funnySprite->setZOrder(3);
     m_spiderSprite->m_paSprite->addChild(funnySprite);
@@ -141,14 +138,20 @@ void HookedPlayerObject::update(float dt) {
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
     if (m_glowSprite) m_glowSprite->setVisible(false);
 
+    
+
+    // TODO: set visibility of funnysprite depending on iconSprite
+
     if (m_iconSprite) {
         fields->m_funnySprite->setScaleX(m_iconSprite->getScaleX());
         fields->m_funnySprite->setScaleY(m_iconSprite->getScaleY());
+        fields->m_funnySprite->setRotation(m_iconSprite->getRotation());
     }
 
     if (m_vehicleSprite) {
         fields->m_funnyVehicleSprite->setScaleX(m_vehicleSprite->getScaleX());
         fields->m_funnyVehicleSprite->setScaleY(m_vehicleSprite->getScaleY());
+        fields->m_funnyVehicleSprite->setRotation(m_vehicleSprite->getRotation());
     }
 }
 

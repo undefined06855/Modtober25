@@ -1,9 +1,9 @@
 #include "FunnySprite.hpp"
 #include "FunnySpriteManager.hpp"
 
-FunnySprite* FunnySprite::create(PlayerObject* playerObject) {
+FunnySprite* FunnySprite::create() {
     auto ret = new FunnySprite;
-    if (ret->init(playerObject)) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
@@ -12,18 +12,20 @@ FunnySprite* FunnySprite::create(PlayerObject* playerObject) {
     return nullptr;
 }
 
-bool FunnySprite::init(PlayerObject* playerObject) {
+bool FunnySprite::init() {
     if (!CCSprite::initWithFile("blank.png"_spr)) return false;
 
-    if (!playerObject) return false;
-
-    m_playerObject = playerObject;
     m_currentTexture = 0;
     m_currentMappingTexture = 0;
 
-    setShaderProgram(FunnySpriteManager::get().m_mappingShader);
+    setShaderProgram(FunnySpriteManager::get().getMappingShader());
 
     return true;
+}
+
+void FunnySprite::updateForGamemode(IconType gamemode) {
+    if (gamemode > IconType::Jetpack) return;
+    updateForGamemode((FunnySpriteGamemode)gamemode);
 }
 
 void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {

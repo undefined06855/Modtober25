@@ -39,5 +39,7 @@ void main() {
     vec4 color = texture2D(CC_Texture0, mapping.rg);
     gl_FragColor = v_fragmentColor * color;
     gl_FragColor.a *= mapping.b;
+
+    // gl_FragColor = vec4(mapping, 1.0);
 }
 )";

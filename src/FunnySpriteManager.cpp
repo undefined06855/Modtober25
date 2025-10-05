@@ -1,21 +1,27 @@
 #include "FunnySpriteManager.hpp"
 #include "shaders.hpp"
 
-FunnySpriteManager::FunnySpriteManager()
-    : m_cube(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_ship(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_ball(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_ufo(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_wave(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_robot(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_spider(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_swing(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
-    , m_jetpack(128, 128, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE)
+// 32 * 4 * 4 = 512
+// icon size * high graphics * 4
+#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE
 
-    , m_mappingShader(nullptr)
+FunnySpriteManager::FunnySpriteManager()
+    : m_cube(RENDERTEXTURE_INIT_PARAMS)
+    , m_ship(RENDERTEXTURE_INIT_PARAMS)
+    , m_ball(RENDERTEXTURE_INIT_PARAMS)
+    , m_ufo(RENDERTEXTURE_INIT_PARAMS)
+    , m_wave(RENDERTEXTURE_INIT_PARAMS)
+    , m_robot(RENDERTEXTURE_INIT_PARAMS)
+    , m_spider(RENDERTEXTURE_INIT_PARAMS)
+    , m_swing(RENDERTEXTURE_INIT_PARAMS)
+    , m_jetpack(RENDERTEXTURE_INIT_PARAMS)
 
     , m_wantsRealCountForType(false)
-    , m_totalCountForTypes(0) {}
+    , m_totalCountForTypes(0)
+
+    , m_iconsForIconType({}) {}
+
+#undef RENDERTEXTURE_IMAGE_PARAMS
 
 FunnySpriteManager& FunnySpriteManager::get() {
     static FunnySpriteManager instance;
@@ -71,26 +77,9 @@ void FunnySpriteManager::init() {
     cache->addImage("mapping-jetpack.png"_spr, false);
 
     // create shader
-    m_mappingShader = new cocos2d::CCGLProgram;
-    bool ret = m_mappingShader->initWithVertexShaderByteArray(g_mappingShaderVertex, g_mappingShaderFragment);
-    if (!ret) {
-        geode::log::error("Shader failed to load!");
-        geode::log::error("{}", m_mappingShader->fragmentShaderLog()); // probably going to crash anyway
+    getMappingShader();
 
-        // TODO: show flalertlayer on menulayer or something
-        // TODO: remake when gl context changes
-    }
-
-    m_mappingShader->addAttribute(kCCAttributeNamePosition, cocos2d::kCCVertexAttrib_Position);
-    m_mappingShader->addAttribute(kCCAttributeNameColor, cocos2d::kCCVertexAttrib_Color);
-    m_mappingShader->addAttribute(kCCAttributeNameTexCoord, cocos2d::kCCVertexAttrib_TexCoords);
-
-    m_mappingShader->link();
-    m_mappingShader->updateUniforms();
-
-    // set CC_Texture1
-    m_mappingShader->setUniformLocationWith1i(m_mappingShader->getUniformLocationForName("CC_Texture1"), 1);
-
+    // get initial rendered sprites
     updateRenderedSprites();
 
     // get total count for types
@@ -99,24 +88,28 @@ void FunnySpriteManager::init() {
     }
 
     // set m_icon
-    if (geode::Mod::get()->hasSavedValue("icons")) {
+    if (geode::Mod::get()->hasSavedValue("icons") && geode::Mod::get()->getSavedValue<matjson::Value>("icons").size() != 0) {
         // get from mod config
-        auto array = geode::Mod::get()->getSavedValue<matjson::Value>("icons").asArray().unwrapOrDefault();
+        geode::log::info("getting icon data from mod config");
+        auto array = geode::Mod::get()->getSavedValue<matjson::Value>("icons");
         for (int i = 0; i < array.size(); i++) {
-            int index = array[i]["index"].asUInt().unwrapOr(0);
-            auto ofIconType = (IconType)array[i]["of"].asUInt().unwrapOr(0);
+            int index = array[i]["index"].asInt().unwrapOr(0);
+            int ofIconType = array[i]["of"].asUInt().unwrapOr(0);
+
+            geode::log::info("{} icon is {} of {}", i, index, ofIconType);
 
             m_icon[(IconType)i] = IconChoiceInfo{
                 .m_index = index,
-                .m_ofIconType = ofIconType
+                .m_iconType = (IconType)ofIconType
             };
         }
     } else {
         // get from save data
-        for (IconType i = IconType::Cube; fmt::underlying(i) <= fmt::underlying(IconType::Jetpack); i = (IconType)(fmt::underlying(i) + 1)) {
+        geode::log::info("getting icon data from gd save");
+        for (IconType i = IconType::Cube; i <= IconType::Jetpack; i = (IconType)(fmt::underlying(i) + 1)) {
             m_icon[i] = IconChoiceInfo{
                 .m_index = GameManager::get()->activeIconForType(i),
-                .m_ofIconType = i
+                .m_iconType = i
             };
         }
 
@@ -124,7 +117,7 @@ void FunnySpriteManager::init() {
     }
 
     // create m_icons
-    for (IconType i = IconType::Cube; fmt::underlying(i) <= fmt::underlying(IconType::Jetpack); i = (IconType)(fmt::underlying(i) + 1)) {
+    for (IconType i = IconType::Cube; i <= IconType::Jetpack; i = (IconType)(fmt::underlying(i) + 1)) {
         m_iconsForIconType[i] = {};
 
         // first, add all icons for this icon type in the vanilla game
@@ -136,7 +129,7 @@ void FunnySpriteManager::init() {
         }
 
         // then, add all icons for the rest of the icon types, skipping i
-        for (IconType j = IconType::Cube; fmt::underlying(j) <= fmt::underlying(IconType::Jetpack); j = (IconType)(fmt::underlying(j) + 1)) {
+        for (IconType j = IconType::Cube; j <= IconType::Jetpack; j = (IconType)(fmt::underlying(j) + 1)) {
             if (j == i) continue;
 
             for (int k = 0; k < realCountForType(j); k++) {
@@ -149,17 +142,46 @@ void FunnySpriteManager::init() {
     }
 }
 
+cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
+    auto mappingShader = cocos2d::CCShaderCache::sharedShaderCache()->programForKey("mapping_shader"_spr);
+    if (mappingShader) return mappingShader;
+
+    mappingShader = new cocos2d::CCGLProgram;
+    bool ret = mappingShader->initWithVertexShaderByteArray(g_mappingShaderVertex, g_mappingShaderFragment);
+    if (!ret) {
+        geode::log::error("Shader failed to load!");
+        geode::log::error("{}", mappingShader->fragmentShaderLog()); // probably going to crash anyway
+
+        // TODO: show flalertlayer on menulayer or something
+    }
+
+    mappingShader->addAttribute(kCCAttributeNamePosition, cocos2d::kCCVertexAttrib_Position);
+    mappingShader->addAttribute(kCCAttributeNameColor, cocos2d::kCCVertexAttrib_Color);
+    mappingShader->addAttribute(kCCAttributeNameTexCoord, cocos2d::kCCVertexAttrib_TexCoords);
+
+    mappingShader->link();
+    mappingShader->updateUniforms();
+
+    // set CC_Texture1
+    mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture1"), 1);
+
+    cocos2d::CCShaderCache::sharedShaderCache()->addProgram(mappingShader, "mapping_shader"_spr);
+
+    return mappingShader;
+}
+
 void FunnySpriteManager::saveIconChoice() {
-    auto array = matjson::Value(std::vector<matjson::Value>{});
+    std::vector<matjson::Value> save = {};
+    save.resize(fmt::underlying(IconType::Jetpack) + 1, nullptr);
 
     for (auto& [type, info] : m_icon) {
-        array[fmt::underlying(type)] = matjson::makeObject({
+        save[fmt::underlying(type)] = matjson::makeObject({
             { "index", info.m_index },
-            { "of", fmt::underlying(info.m_ofIconType) }
+            { "of", fmt::underlying(info.m_iconType) }
         });
     }
 
-    geode::Mod::get()->setSavedValue("icons", array);
+    geode::Mod::get()->setSavedValue("icons", matjson::Value(save));
 }
 
 void FunnySpriteManager::updateRenderedSprites() {
@@ -180,7 +202,7 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 
     auto gameManager = GameManager::get();
 
-    simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_ofIconType);
+    simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_iconType);
     simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
     simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
     simplePlayer->setGlowOutline(gameManager->colorForIdx(gameManager->getPlayerGlowColor()));
@@ -203,15 +225,6 @@ int FunnySpriteManager::realCountForType(IconType type) {
     m_wantsRealCountForType = false;
 
     return ret;
-}
-
-int FunnySpriteManager::currentIconIndexInTermsOf(IconType type, IconType typeInTermsOf) {
-    if (!m_icon.contains(type)) return -1;
-
-    auto& info = m_icon[type];
-
-    if (info.m_ofIconType == typeInTermsOf) return info.m_index;
-    else return -1;
 }
 
 CCMenuItemSpriteExtra* FunnySpriteManager::getIcon(UnloadedSingleIconInfo info, GJGarageLayer* target) {

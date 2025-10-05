@@ -28,7 +28,7 @@ bool HookedGJGarageLayer::init() {
 
     auto wrapper = CCNode::create();
     wrapper->setPosition({ winWidth / 2.f, 235.f });
-    wrapper->setScale(1.5f);
+    wrapper->setScale(15.f);
     addChild(wrapper);
 
     auto player = FunnySprite::create();
@@ -67,7 +67,7 @@ void HookedGJGarageLayer::setupPage(int page, IconType type) {
     }
 
     geode::log::debug("setting up page {} for icon type {}", page, fmt::underlying(type));
-    
+
     // FIXME: this randomly crashes if you click death effects -> trails -> any tab
     GJGarageLayer::setupPage(page, type);
 

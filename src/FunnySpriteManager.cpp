@@ -47,34 +47,22 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode) {
 GLuint FunnySpriteManager::mappingTextureForGamemode(FunnySpriteGamemode gamemode) {
     auto cache = cocos2d::CCTextureCache::get();
 
-    switch (gamemode) {
-        case FunnySpriteGamemode::CubePassenger:
-        case FunnySpriteGamemode::Cube: return cache->textureForKey("mapping-cube.png"_spr)->getName();
-        case FunnySpriteGamemode::Ship: return cache->textureForKey("mapping-ship.png"_spr)->getName();
-        case FunnySpriteGamemode::Ball: return cache->textureForKey("mapping-ball.png"_spr)->getName();
-        case FunnySpriteGamemode::Ufo: return cache->textureForKey("mapping-ufo.png"_spr)->getName();
-        case FunnySpriteGamemode::Wave: return cache->textureForKey("mapping-wave.png"_spr)->getName();
-        case FunnySpriteGamemode::Robot: return cache->textureForKey("mapping-robot.png"_spr)->getName();
-        case FunnySpriteGamemode::Spider: return cache->textureForKey("mapping-spider.png"_spr)->getName();
-        case FunnySpriteGamemode::Swing: return cache->textureForKey("mapping-swing.png"_spr)->getName();
-        case FunnySpriteGamemode::Jetpack: return cache->textureForKey("mapping-jetpack.png"_spr)->getName();
-        default: return 0;
-    }
+    if (gamemode == FunnySpriteGamemode::CubePassenger) gamemode = FunnySpriteGamemode::Cube;
+
+    auto texture = cache->textureForKey(fmt::format("{:04}.png"_spr, fmt::underlying(gamemode) + 1).c_str());
+
+    if (!texture) return 0;
+    else return texture->getName();
 }
 
 void FunnySpriteManager::init() {
     // add textures to cache
     auto cache = cocos2d::CCTextureCache::get();
 
-    cache->addImage("mapping-cube.png"_spr, false);
-    cache->addImage("mapping-ship.png"_spr, false);
-    cache->addImage("mapping-ball.png"_spr, false);
-    cache->addImage("mapping-ufo.png"_spr, false);
-    cache->addImage("mapping-wave.png"_spr, false);
-    cache->addImage("mapping-robot.png"_spr, false);
-    cache->addImage("mapping-spider.png"_spr, false);
-    cache->addImage("mapping-swing.png"_spr, false);
-    cache->addImage("mapping-jetpack.png"_spr, false);
+    for (int i = 1; i <= 9; i++) {
+        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false)
+            ->setAliasTexParameters();
+    }
 
     // create shader
     getMappingShader();
@@ -212,8 +200,13 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     // something the same size as the screen ?
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     simplePlayer->setPosition(winSize / 2.f);
-    simplePlayer->setScaleX(winSize.width / playerSprite->getContentWidth());
-    simplePlayer->setScaleY(winSize.height / playerSprite->getContentHeight());
+    if (gameManager->getPlayerGlow()) {
+        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 2.f));
+        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 2.f));
+    } else {
+        simplePlayer->setScaleX(winSize.width / playerSprite->getContentWidth());
+        simplePlayer->setScaleY(winSize.height / playerSprite->getContentHeight());
+    }
 
     renderTexture.capture(simplePlayer);
     simplePlayer->release();

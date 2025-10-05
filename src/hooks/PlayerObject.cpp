@@ -26,63 +26,101 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     m_mainLayer->addChild(funnyVehicleSprite);
     fields->m_funnyVehicleSprite = funnyVehicleSprite;
 
-    fields->m_lastLastActivatedPortal = nullptr;
+    fields->m_currentGamemode = Gamemode::None;
 
     return true;
 }
 
-void HookedPlayerObject::updatePlayerArt() {
-    PlayerObject::updatePlayerArt();
+void HookedPlayerObject::toggleFlyMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleFlyMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Ship);
+    else exitGamemode(Gamemode::Ship);
+}
+
+void HookedPlayerObject::toggleRollMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleRollMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Ball);
+    else exitGamemode(Gamemode::Ball);
+}
+
+void HookedPlayerObject::toggleBirdMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleBirdMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Ufo);
+    else exitGamemode(Gamemode::Ufo);
+}
+
+void HookedPlayerObject::toggleDartMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleDartMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Wave);
+    else exitGamemode(Gamemode::Wave);
+}
+
+void HookedPlayerObject::toggleRobotMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleRobotMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Robot);
+    else exitGamemode(Gamemode::Robot);
+}
+
+void HookedPlayerObject::toggleSpiderMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleSpiderMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Spider);
+    else exitGamemode(Gamemode::Spider);
+}
+
+void HookedPlayerObject::toggleSwingMode(bool enabled, bool fromStart) {
+    PlayerObject::toggleSwingMode(enabled, fromStart);
+    if (enabled) enterGamemode(Gamemode::Swing);
+    else exitGamemode(Gamemode::Swing);
+}
+
+void HookedPlayerObject::enterGamemode(Gamemode gamemode) {
+    m_fields->m_currentGamemode = gamemode;
+    updateFunnySprite();
+}
+
+void HookedPlayerObject::exitGamemode(Gamemode gamemode) {
+    auto fields = m_fields.self();
+
+    if (fields->m_currentGamemode == gamemode) {
+        // when going into cube rob toggles off every gamemode
+        // we just have to assume that's what he's doing
+        fields->m_currentGamemode = Gamemode::Cube;
+        updateFunnySprite(); // which makes this unnecessary 7 out of 8 times
+    }
+}
+
+void HookedPlayerObject::updateFunnySprite() {
     if (!m_gameLayer) return;
 
     auto fields = m_fields.self();
 
-    if (fields->m_lastLastActivatedPortal == m_lastActivatedPortal) return;
-    fields->m_lastLastActivatedPortal = m_lastActivatedPortal;
+    auto funnySpriteGamemode = (FunnySpriteGamemode)fields->m_currentGamemode;
+    if (m_isPlatformer && funnySpriteGamemode == FunnySpriteGamemode::Ship) {
+        funnySpriteGamemode = FunnySpriteGamemode::Jetpack;
+    }
 
-    if (!m_lastActivatedPortal) return;
-
-    static const std::unordered_map<GameObjectType, FunnySpriteGamemode> gameObjectToIconMap = {
-        { GameObjectType::CubePortal, FunnySpriteGamemode::Cube },
-        { GameObjectType::ShipPortal, FunnySpriteGamemode::Ship },
-        { GameObjectType::BallPortal, FunnySpriteGamemode::Ball },
-        { GameObjectType::UfoPortal, FunnySpriteGamemode::Ufo },
-        { GameObjectType::WavePortal, FunnySpriteGamemode::Wave },
-        { GameObjectType::RobotPortal, FunnySpriteGamemode::Robot },
-        { GameObjectType::SpiderPortal, FunnySpriteGamemode::Spider },
-        { GameObjectType::SwingPortal, FunnySpriteGamemode::Swing }
-    };
-
-    auto type = m_lastActivatedPortal->m_objectType;
-
-    if (!gameObjectToIconMap.contains(type)) return;
-
-    auto iconType = gameObjectToIconMap.at(type);
-
-    if (type == GameObjectType::ShipPortal && m_isPlatformer) iconType = FunnySpriteGamemode::Jetpack;
-
-    switch (type) {
-        case GameObjectType::CubePortal:
-        case GameObjectType::BallPortal:
-        case GameObjectType::WavePortal:
-        case GameObjectType::SwingPortal: {
+    switch (fields->m_currentGamemode) {
+        case Gamemode::Cube:
+        case Gamemode::Ball:
+        case Gamemode::Wave:
+        case Gamemode::Swing: {
             // set type to whatever, hide vehicle
-            fields->m_funnySprite->updateForGamemode(iconType);
+            fields->m_funnySprite->updateForGamemode(funnySpriteGamemode);
             fields->m_funnySprite->setVisible(true);
             fields->m_funnyVehicleSprite->setVisible(false);
         } break;
 
-        case GameObjectType::ShipPortal:
-        case GameObjectType::UfoPortal: {
+        case Gamemode::Ship:
+        case Gamemode::Ufo: {
             // set sprite to cube (passenger), show vehicle
             fields->m_funnySprite->updateForGamemode(FunnySpriteGamemode::CubePassenger);
-            fields->m_funnyVehicleSprite->updateForGamemode(iconType);
+            fields->m_funnyVehicleSprite->updateForGamemode(funnySpriteGamemode);
             fields->m_funnySprite->setVisible(true);
             fields->m_funnyVehicleSprite->setVisible(true);
         } break;
 
-        case GameObjectType::RobotPortal:
-        case GameObjectType::SpiderPortal: {
+        case Gamemode::Robot:
+        case Gamemode::Spider: {
             // let the funnysprites in gjspidersprite and gjrobotsprite handle this
             fields->m_funnySprite->setVisible(false);
             fields->m_funnyVehicleSprite->setVisible(false);
@@ -128,6 +166,7 @@ void HookedPlayerObject::update(float dt) {
 
     auto fields = m_fields.self();
 
+    // FIXME: flicker!
     if (m_spiderSprite && m_spiderSprite->m_glowSprite) m_spiderSprite->m_glowSprite->setVisible(false);
     if (m_spiderSprite && m_spiderSprite->m_headSprite) m_spiderSprite->m_headSprite->setVisible(false);
 
@@ -137,8 +176,6 @@ void HookedPlayerObject::update(float dt) {
     if (m_iconSprite) m_iconSprite->setVisible(false);
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
     if (m_glowSprite) m_glowSprite->setVisible(false);
-
-    
 
     // TODO: set visibility of funnysprite depending on iconSprite
 

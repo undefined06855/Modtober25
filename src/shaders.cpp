@@ -35,7 +35,15 @@ uniform sampler2D CC_Texture0; // icon data
 uniform sampler2D CC_Texture1; // mapping
 
 void main() {
-    vec3 mapping = texture2D(CC_Texture1, v_texCoord).rga; // x (r), y (g), a (b)
+    vec3 mapping = texture2D(CC_Texture1, v_texCoord).rgb;
+
+    if (mapping.b != 0.0) {
+        // edge pixel
+        
+    }
+
+    // if (mapping.b == 0.0) discard;
+
     vec4 color = texture2D(CC_Texture0, mapping.rg);
     gl_FragColor = v_fragmentColor * color;
     gl_FragColor.a *= mapping.b;

@@ -9,16 +9,32 @@ public:
     void visit();
 };
 
+enum class Gamemode {
+    None = -1, // -1 not 0 for None is sad
+    Cube, Ship, Ball, Ufo, Wave, Robot, Spider, Swing,
+};
+
 class $modify(HookedPlayerObject, PlayerObject) {
     struct Fields {
         FunnySprite* m_funnySprite;
         FunnySprite* m_funnyVehicleSprite;
-        GameObject* m_lastLastActivatedPortal;
+        Gamemode m_currentGamemode; // hope this doesnt desync!
     };
 
     bool init(int player, int ship, GJBaseGameLayer* gameLayer, cocos2d::CCLayer* layer, bool playLayer);
 
-    void updatePlayerArt();
+    void toggleFlyMode(bool enabled, bool fromStart);
+    void toggleRollMode(bool enabled, bool fromStart);
+    void toggleBirdMode(bool enabled, bool fromStart);
+    void toggleDartMode(bool enabled, bool fromStart);
+    void toggleRobotMode(bool enabled, bool fromStart);
+    void toggleSpiderMode(bool enabled, bool fromStart);
+    void toggleSwingMode(bool enabled, bool fromStart);
+
+    void enterGamemode(Gamemode gamemode);
+    void exitGamemode(Gamemode gamemode);
+
+    void updateFunnySprite();
 
     void createRobot(int frame);
     void createSpider(int frame);

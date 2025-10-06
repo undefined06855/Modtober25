@@ -48,6 +48,7 @@ public:
 
     GLuint textureForGamemode(FunnySpriteGamemode gamemode);
     GLuint mappingTextureForGamemode(FunnySpriteGamemode gamemode);
+    GLuint transparencyMaskForGamemode(FunnySpriteGamemode gamemode);
 
     int realCountForType(IconType type);
 

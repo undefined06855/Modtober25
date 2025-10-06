@@ -18,6 +18,7 @@ public:
 
     GLuint m_currentTexture;
     GLuint m_currentMappingTexture;
+    GLuint m_currentTransparencyTexture;
 
     void updateForGamemode(FunnySpriteGamemode gamemode);
     void updateForGamemode(IconType gamemode);

@@ -17,6 +17,7 @@ bool FunnySprite::init() {
 
     m_currentTexture = 0;
     m_currentMappingTexture = 0;
+    m_currentTransparencyTexture = 0;
 
     setShaderProgram(FunnySpriteManager::get().getMappingShader());
 
@@ -78,6 +79,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
 
     m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode);
     m_currentMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
+    m_currentTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
 
     setPosition(gamemodeInfo.m_offset);
     setScale(gamemodeInfo.m_scale);
@@ -109,6 +111,7 @@ void FunnySprite::draw() {
     // properly on every sprite after
     cocos2d::ccGLBindTexture2DN(0, m_currentTexture);
     cocos2d::ccGLBindTexture2DN(1, m_currentMappingTexture);
+    cocos2d::ccGLBindTexture2DN(2, m_currentTransparencyTexture);
 
     cocos2d::ccGLEnableVertexAttribs(cocos2d::kCCVertexAttribFlag_PosColorTex);
 

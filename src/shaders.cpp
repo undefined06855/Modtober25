@@ -33,21 +33,16 @@ varying vec4 v_fragmentColor;
 varying vec2 v_texCoord;
 uniform sampler2D CC_Texture0; // icon data
 uniform sampler2D CC_Texture1; // mapping
+uniform sampler2D CC_Texture2; // transparency
 
 void main() {
+    float transparency = texture2D(CC_Texture2, v_texCoord).r;
+    if (transparency == 0.0) discard;
+
     vec3 mapping = texture2D(CC_Texture1, v_texCoord).rgb;
-
-    if (mapping.b != 0.0) {
-        // edge pixel
-        
-    }
-
-    // if (mapping.b == 0.0) discard;
 
     vec4 color = texture2D(CC_Texture0, mapping.rg);
     gl_FragColor = v_fragmentColor * color;
-    gl_FragColor.a *= mapping.b;
-
-    // gl_FragColor = vec4(mapping, 1.0);
+    gl_FragColor.a *= transparency;
 }
 )";

@@ -3,7 +3,7 @@
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
-#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_NEAREST, GL_CLAMP_TO_EDGE
+#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE
 
 FunnySpriteManager::FunnySpriteManager()
     : m_cube(RENDERTEXTURE_INIT_PARAMS)
@@ -55,13 +55,23 @@ GLuint FunnySpriteManager::mappingTextureForGamemode(FunnySpriteGamemode gamemod
     else return texture->getName();
 }
 
+GLuint FunnySpriteManager::transparencyMaskForGamemode(FunnySpriteGamemode gamemode) {
+    auto cache = cocos2d::CCTextureCache::get();
+
+    if (gamemode == FunnySpriteGamemode::CubePassenger) gamemode = FunnySpriteGamemode::Cube;
+
+    auto texture = cache->textureForKey(fmt::format("{:04}.png"_spr, fmt::underlying(gamemode) + 1 + 9).c_str());
+
+    if (!texture) return 0;
+    else return texture->getName();
+}
+
 void FunnySpriteManager::init() {
     // add textures to cache
     auto cache = cocos2d::CCTextureCache::get();
 
-    for (int i = 1; i <= 9; i++) {
-        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false)
-            ->setAliasTexParameters();
+    for (int i = 1; i <= 18; i++) {
+        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false);
     }
 
     // create shader
@@ -150,8 +160,9 @@ cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
     mappingShader->link();
     mappingShader->updateUniforms();
 
-    // set CC_Texture1
+    // set CC_Texture1 and CC_Texture2
     mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture1"), 1);
+    mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture2"), 2);
 
     cocos2d::CCShaderCache::sharedShaderCache()->addProgram(mappingShader, "mapping_shader"_spr);
 
@@ -197,15 +208,18 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     if (!gameManager->getPlayerGlow()) simplePlayer->disableGlowOutline();
 
     // so apparently mat rendertexture is only good if you're rendering
-    // something the same size as the screen ?
+    // something the same size as the screen so we need to resize
+    // TODO: look into this?
+
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     simplePlayer->setPosition(winSize / 2.f);
     if (gameManager->getPlayerGlow()) {
-        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 2.f));
-        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 2.f));
+        // add more space for glow
+        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 3.5f));
+        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 3.5f));
     } else {
-        simplePlayer->setScaleX(winSize.width / playerSprite->getContentWidth());
-        simplePlayer->setScaleY(winSize.height / playerSprite->getContentHeight());
+        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 1.5f));
+        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 1.5f));
     }
 
     renderTexture.capture(simplePlayer);

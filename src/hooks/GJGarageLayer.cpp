@@ -28,7 +28,7 @@ bool HookedGJGarageLayer::init() {
 
     auto wrapper = CCNode::create();
     wrapper->setPosition({ winWidth / 2.f, 235.f });
-    wrapper->setScale(15.f);
+    wrapper->setScale(1.5f);
     addChild(wrapper);
 
     auto player = FunnySprite::create();

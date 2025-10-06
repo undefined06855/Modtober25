@@ -36,8 +36,8 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Ship, {
-            .m_scale = 1.f,
-            .m_offset = { 0.f, 0.f }
+            .m_scale = 1.325f,
+            .m_offset = { 0.f, -3.f }
         } },
         { FunnySpriteGamemode::Ball, {
             .m_scale = 1.f,
@@ -48,16 +48,16 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Wave, {
-            .m_scale = 1.f,
+            .m_scale = .75f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Robot, {
-            .m_scale = 1.f,
+            .m_scale = 1.1f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Spider, {
-            .m_scale = 1.f,
-            .m_offset = { 0.f, 0.f }
+            .m_scale = 1.15f,
+            .m_offset = { 1.f, 0.f }
         } },
         { FunnySpriteGamemode::Swing, {
             .m_scale = 1.f,
@@ -68,8 +68,8 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::CubePassenger, {
-            .m_scale = .575f,
-            .m_offset = { 0.f, 0.f }
+            .m_scale = .3f,
+            .m_offset = { 0.f, 2.f } // ! don't change x offset
         } }
     };
 
@@ -81,8 +81,12 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
     m_currentMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
     m_currentTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
 
-    setPosition(gamemodeInfo.m_offset);
-    setScale(gamemodeInfo.m_scale);
+    // to allow us to use setScale and stuff to copy the original icon's
+    // transforms, we'll use an additional transform
+    auto transform = cocos2d::CCAffineTransformMakeIdentity();
+    transform = cocos2d::CCAffineTransformTranslate(transform, gamemodeInfo.m_offset.x, gamemodeInfo.m_offset.y);
+    transform = cocos2d::CCAffineTransformScale(transform, gamemodeInfo.m_scale, gamemodeInfo.m_scale);
+    setAdditionalTransform(transform);
 }
 
 // taken from icon ninja

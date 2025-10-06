@@ -37,7 +37,7 @@ uniform sampler2D CC_Texture2; // transparency
 
 void main() {
     float transparency = texture2D(CC_Texture2, v_texCoord).r;
-    if (transparency == 0.0) discard;
+    if (transparency != 1.0) discard; // TODO: test this?
 
     vec3 mapping = texture2D(CC_Texture1, v_texCoord).rgb;
 

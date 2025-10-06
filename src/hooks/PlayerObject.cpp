@@ -4,12 +4,26 @@ void FakeSpriteBatchNode::draw() { CCNode::draw(); }
 void FakeSpriteBatchNode::visit() { CCNode::visit(); }
 
 bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, cocos2d::CCLayer* layer, bool playLayer) {
-    if (!PlayerObject::init(player, ship, gameLayer, layer, playLayer)) return false;
-    if (!gameLayer) return true; // menu icon (check repeated in other functions)
+    if (!gameLayer) {
+        // this is an icon on menulayer
+        return PlayerObject::init(player, ship, gameLayer, layer, playLayer);
+    }
 
-    // TODO: starting a level as a non-cube gamemode uses cube mapping
-    // TODO: restarting a level as spider/robot doesn't make sprite visible again
-    // TODO: player trail still default
+    auto gm = GameManager::get();
+    auto origGlow = gm->getPlayerGlow();
+    auto origSpider = gm->getPlayerSpider();
+    auto origRobot = gm->getPlayerRobot();
+    gm->setPlayerGlow(false);
+    gm->setPlayerRobot(1); // use default legs for spider and robot
+    gm->setPlayerSpider(1);
+
+    if (!PlayerObject::init(player, ship, gameLayer, layer, playLayer)) return false;
+
+    gm->setPlayerGlow(origGlow);
+    gm->setPlayerRobot(origRobot);
+    gm->setPlayerSpider(origSpider);
+
+    // TODO: player ghost trail effect still default
 
     auto fields = m_fields.self();
 
@@ -99,6 +113,8 @@ void HookedPlayerObject::updateFunnySprite() {
         funnySpriteGamemode = FunnySpriteGamemode::Jetpack;
     }
 
+    // TODO: ufo dome
+
     switch (fields->m_currentGamemode) {
         case Gamemode::Cube:
         case Gamemode::Ball:
@@ -142,6 +158,10 @@ void HookedPlayerObject::createRobot(int frame) {
     funnySprite->setZOrder(3);
     m_robotSprite->m_paSprite->addChild(funnySprite);
 
+    // nuclear option
+    // somehow rob resets everything on this every frame ??
+    m_robotSprite->m_headSprite->removeFromParent();
+
     patchBatchNode(m_robotBatchNode);
 }
 
@@ -157,6 +177,8 @@ void HookedPlayerObject::createSpider(int frame) {
     funnySprite->setZOrder(3);
     m_spiderSprite->m_paSprite->addChild(funnySprite);
 
+    m_spiderSprite->m_headSprite->removeFromParent();
+
     patchBatchNode(m_spiderBatchNode);
 }
 
@@ -166,16 +188,8 @@ void HookedPlayerObject::update(float dt) {
 
     auto fields = m_fields.self();
 
-    // FIXME: flicker!
-    if (m_spiderSprite && m_spiderSprite->m_glowSprite) m_spiderSprite->m_glowSprite->setVisible(false);
-    if (m_spiderSprite && m_spiderSprite->m_headSprite) m_spiderSprite->m_headSprite->setVisible(false);
-
-    if (m_robotSprite && m_robotSprite->m_glowSprite) m_robotSprite->m_glowSprite->setVisible(false);
-    if (m_robotSprite && m_robotSprite->m_headSprite) m_robotSprite->m_headSprite->setVisible(false);
-
     if (m_iconSprite) m_iconSprite->setVisible(false);
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
-    if (m_glowSprite) m_glowSprite->setVisible(false);
 
     // TODO: set visibility of funnysprite depending on iconSprite
 

@@ -215,11 +215,11 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     simplePlayer->setPosition(winSize / 2.f);
     if (gameManager->getPlayerGlow()) {
         // add more space for glow
-        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 3.5f));
-        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 3.5f));
+        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 2.5f));
+        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 2.5f));
     } else {
-        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 1.5f));
-        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 1.5f));
+        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + .5f));
+        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + .5f));
     }
 
     renderTexture.capture(simplePlayer);

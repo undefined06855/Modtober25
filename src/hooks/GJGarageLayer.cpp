@@ -129,6 +129,12 @@ void HookedGJGarageLayer::onSelect(cocos2d::CCObject* sender) {
         return;
     }
 
+    if (!GameManager::get()->isIconUnlocked(cast->getTag(), cast->m_iconType)) {
+        auto unlock = GameManager::get()->iconTypeToUnlockType(cast->m_iconType);
+        showUnlockPopup(cast->getTag(), unlock);
+        return;
+    }
+
     auto& fsm = FunnySpriteManager::get();
 
     fsm.m_icon[m_iconType] = IconChoiceInfo{

@@ -1,8 +1,6 @@
 #include "GJGarageLayer.hpp"
 #include "../FunnySpriteManager.hpp"
 
-// TODO: the current page isn't correct
-
 void HookedGJGarageLayer::onModify(auto& self) {
     // TODO: find correct hook prios for all hooks
     (void)self.setHookPriorityAfterPost("GJGargeLayer::onSelect", "hiimjustin000.more_icons");
@@ -14,6 +12,8 @@ bool HookedGJGarageLayer::init() {
     fields->m_initializing = true;
     if (!GJGarageLayer::init()) return false;
     fields->m_initializing = false;
+
+    // TODO: last two tab page count / arrow visibility is broken?
 
     // set m_iconPages to set the start pages for each tab
     auto& fsm = FunnySpriteManager::get();
@@ -68,7 +68,7 @@ void HookedGJGarageLayer::setupPage(int page, IconType type) {
 
     geode::log::debug("setting up page {} for icon type {}", page, fmt::underlying(type));
 
-    // FIXME: this randomly crashes if you click death effects -> trails -> any tab
+    // TODO: this randomly crashes if you click death effects -> trails -> any tab
     GJGarageLayer::setupPage(page, type);
 
     if (type > IconType::Jetpack) return;

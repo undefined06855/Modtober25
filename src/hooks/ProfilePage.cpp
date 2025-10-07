@@ -25,6 +25,7 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
         child->addChild(funnySprite);
 
         // add passenger for gamemodes that need it
+        // TODO: fix this
         if (gamemode == FunnySpriteGamemode::Ship || gamemode == FunnySpriteGamemode::Ufo) {
             auto passenger = FunnySprite::create();
             passenger->updateForGamemode(FunnySpriteGamemode::CubePassenger);

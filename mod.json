@@ -15,10 +15,17 @@
     "tags": [ "modtober25", "gameplay", "joke" ],
 
     "resources": {
-        "sprites": [ "resources/*.png" ]
+        "sprites": [
+            "resources/*.png",
+            "resources/mapping/*.png"
+        ]
     },
 
     "links": {
         "source": "https://github.com/undefined06855/Modtober25"
+    },
+
+    "dependencies": {
+        "geode.node-ids": "v1.21.0"
     }
 }

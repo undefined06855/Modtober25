@@ -48,7 +48,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Wave, {
-            .m_scale = .75f,
+            .m_scale = .85f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Robot, {
@@ -60,13 +60,14 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 1.f, 0.f }
         } },
         { FunnySpriteGamemode::Swing, {
-            .m_scale = 1.f,
+            .m_scale = 1.15f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Jetpack, {
             .m_scale = 1.f,
             .m_offset = { 0.f, 0.f }
         } },
+        // TODO: fix scale on mini ufo
         { FunnySpriteGamemode::CubePassenger, {
             .m_scale = .3f,
             .m_offset = { 0.f, 2.f } // ! don't change x offset
@@ -87,6 +88,8 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
     transform = cocos2d::CCAffineTransformTranslate(transform, gamemodeInfo.m_offset.x, gamemodeInfo.m_offset.y);
     transform = cocos2d::CCAffineTransformScale(transform, gamemodeInfo.m_scale, gamemodeInfo.m_scale);
     setAdditionalTransform(transform);
+    m_bAdditionalTransformDirty = true;
+    updateTransform();
 }
 
 // taken from icon ninja

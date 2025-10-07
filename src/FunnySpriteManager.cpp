@@ -77,8 +77,8 @@ void FunnySpriteManager::init() {
     // create shader
     getMappingShader();
 
-    // get initial rendered sprites
-    updateRenderedSprites();
+    // update rendered sprites (now done in menulayer!!!)
+    // updateRenderedSprites();
 
     // get total count for types
     for (int i = fmt::underlying(IconType::Cube); i <= fmt::underlying(IconType::Jetpack); i++) {
@@ -210,6 +210,8 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     // so apparently mat rendertexture is only good if you're rendering
     // something the same size as the screen so we need to resize
     // TODO: look into this?
+
+    // TODO: flip colours for dual
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     simplePlayer->setPosition(winSize / 2.f);

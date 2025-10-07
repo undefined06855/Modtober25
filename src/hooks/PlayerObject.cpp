@@ -23,6 +23,9 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     gm->setPlayerRobot(origRobot);
     gm->setPlayerSpider(origSpider);
 
+    // TODO: icon gradients + fine outline compat (just disable)
+    // TODO: more icons compat?
+
     // TODO: player ghost trail effect still default
 
     auto fields = m_fields.self();
@@ -191,7 +194,8 @@ void HookedPlayerObject::update(float dt) {
     if (m_iconSprite) m_iconSprite->setVisible(false);
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
 
-    // TODO: set visibility of funnysprite depending on iconSprite
+    // TODO: set visibility of funnysprite depending on iconSprite for respawn
+    // animation
 
     if (m_iconSprite) {
         fields->m_funnySprite->setScaleX(m_iconSprite->getScaleX());

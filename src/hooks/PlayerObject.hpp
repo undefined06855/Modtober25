@@ -11,13 +11,16 @@ public:
 
 enum class Gamemode {
     None = -1, // -1 not 0 for None is sad
-    Cube, Ship, Ball, Ufo, Wave, Robot, Spider, Swing,
+    Cube, Ship, Ball, Ufo, Wave, Robot, Spider, Swing
 };
 
 class $modify(HookedPlayerObject, PlayerObject) {
     struct Fields {
         FunnySprite* m_funnySprite;
         FunnySprite* m_funnyVehicleSprite;
+        FunnySprite* m_funnyRobotSprite;
+        FunnySprite* m_funnySpiderSprite;
+        bool m_isDualUpdated;
         Gamemode m_currentGamemode; // hope this doesnt desync!
     };
 

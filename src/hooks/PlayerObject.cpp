@@ -31,12 +31,14 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     auto fields = m_fields.self();
 
     auto funnySprite = FunnySprite::create();
+    funnySprite->setID("funny-sprite"_spr);
     funnySprite->updateForGamemode(FunnySpriteGamemode::Cube);
     funnySprite->setZOrder(1);
     m_mainLayer->addChild(funnySprite);
     fields->m_funnySprite = funnySprite;
 
     auto funnyVehicleSprite = FunnySprite::create();
+    funnyVehicleSprite->setID("funny-vehicle-sprite"_spr);
     funnyVehicleSprite->updateForGamemode(FunnySpriteGamemode::Ship);
     funnyVehicleSprite->setZOrder(2);
     funnyVehicleSprite->setVisible(false);
@@ -44,6 +46,7 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     fields->m_funnyVehicleSprite = funnyVehicleSprite;
 
     fields->m_currentGamemode = Gamemode::None;
+    fields->m_isDualUpdated = false;
 
     return true;
 }
@@ -116,8 +119,6 @@ void HookedPlayerObject::updateFunnySprite() {
         funnySpriteGamemode = FunnySpriteGamemode::Jetpack;
     }
 
-    // TODO: ufo dome
-
     switch (fields->m_currentGamemode) {
         case Gamemode::Cube:
         case Gamemode::Ball:
@@ -132,7 +133,7 @@ void HookedPlayerObject::updateFunnySprite() {
         case Gamemode::Ship:
         case Gamemode::Ufo: {
             // set sprite to cube (passenger), show vehicle
-            fields->m_funnySprite->updateForGamemode(FunnySpriteGamemode::CubePassenger);
+            fields->m_funnySprite->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
             fields->m_funnyVehicleSprite->updateForGamemode(funnySpriteGamemode);
             fields->m_funnySprite->setVisible(true);
             fields->m_funnyVehicleSprite->setVisible(true);
@@ -157,9 +158,11 @@ void HookedPlayerObject::createRobot(int frame) {
     if (m_robotSprite->m_paSprite->getChildByType<FunnySprite>(0)) return;
 
     auto funnySprite = FunnySprite::create();
+    funnySprite->setID("funny-robot-sprite"_spr);
     funnySprite->updateForGamemode(FunnySpriteGamemode::Robot);
     funnySprite->setZOrder(3);
     m_robotSprite->m_paSprite->addChild(funnySprite);
+    m_fields->m_funnyRobotSprite = funnySprite;
 
     // nuclear option
     // somehow rob resets everything on this every frame ??
@@ -176,9 +179,11 @@ void HookedPlayerObject::createSpider(int frame) {
     if (m_spiderSprite->m_paSprite->getChildByType<FunnySprite>(0)) return;
 
     auto funnySprite = FunnySprite::create();
+    funnySprite->setID("funny-spider-sprite"_spr);
     funnySprite->updateForGamemode(FunnySpriteGamemode::Spider);
     funnySprite->setZOrder(3);
     m_spiderSprite->m_paSprite->addChild(funnySprite);
+    m_fields->m_funnySpiderSprite = funnySprite;
 
     m_spiderSprite->m_headSprite->removeFromParent();
 
@@ -194,12 +199,12 @@ void HookedPlayerObject::update(float dt) {
     if (m_iconSprite) m_iconSprite->setVisible(false);
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
 
-    // TODO: set visibility of funnysprite depending on iconSprite for respawn
-    // animation
-
     if (m_iconSprite) {
-        fields->m_funnySprite->setScaleX(m_iconSprite->getScaleX());
-        fields->m_funnySprite->setScaleY(m_iconSprite->getScaleY());
+        // cube platformer animations
+        if (fields->m_currentGamemode == Gamemode::Cube) {
+            fields->m_funnySprite->setScaleX(m_iconSprite->getScaleX());
+            fields->m_funnySprite->setScaleY(m_iconSprite->getScaleY());
+        }
         fields->m_funnySprite->setRotation(m_iconSprite->getRotation());
     }
 
@@ -208,6 +213,25 @@ void HookedPlayerObject::update(float dt) {
         fields->m_funnyVehicleSprite->setScaleY(m_vehicleSprite->getScaleY());
         fields->m_funnyVehicleSprite->setRotation(m_vehicleSprite->getRotation());
     }
+
+    fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
+    fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
+
+
+    if (m_isSecondPlayer && !fields->m_isDualUpdated) {
+        fields->m_funnySprite->m_dual = true;
+        fields->m_funnyVehicleSprite->m_dual = true;
+        fields->m_funnyRobotSprite->m_dual = true;
+        fields->m_funnySpiderSprite->m_dual = true;
+
+        fields->m_funnySprite->updateForGamemode(fields->m_funnySprite->m_currentGamemode);
+        fields->m_funnyVehicleSprite->updateForGamemode(fields->m_funnyVehicleSprite->m_currentGamemode);
+        fields->m_funnySpiderSprite->updateForGamemode(FunnySpriteGamemode::Spider);
+        fields->m_funnyRobotSprite->updateForGamemode(FunnySpriteGamemode::Robot);
+
+        fields->m_isDualUpdated = true;
+    }
+
 }
 
 void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {

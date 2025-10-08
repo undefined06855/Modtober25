@@ -1,9 +1,5 @@
 #include "shaders.hpp"
 
-// TODO: rerender mapping sprites to ensure they dont have artifacts on the edge
-// where they sample random pixels
-// (didnt know where to put this i dont have a todo file :broken_heart:)
-
 const GLchar* g_mappingShaderVertex = R"(
 attribute vec4 a_position;
 attribute vec2 a_texCoord;

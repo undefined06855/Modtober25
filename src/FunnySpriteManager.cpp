@@ -5,7 +5,7 @@
 // icon size * high graphics * 4
 #define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE
 
-FunnySpriteManager::FunnySpriteManager()
+RenderTextureGroup::RenderTextureGroup()
     : m_cube(RENDERTEXTURE_INIT_PARAMS)
     , m_ship(RENDERTEXTURE_INIT_PARAMS)
     , m_ball(RENDERTEXTURE_INIT_PARAMS)
@@ -14,40 +14,60 @@ FunnySpriteManager::FunnySpriteManager()
     , m_robot(RENDERTEXTURE_INIT_PARAMS)
     , m_spider(RENDERTEXTURE_INIT_PARAMS)
     , m_swing(RENDERTEXTURE_INIT_PARAMS)
-    , m_jetpack(RENDERTEXTURE_INIT_PARAMS)
+    , m_jetpack(RENDERTEXTURE_INIT_PARAMS) {}
+
+#undef RENDERTEXTURE_IMAGE_PARAMS
+
+FunnySpriteManager::FunnySpriteManager()
+    : m_mainIcons()
+    , m_dualIcons()
 
     , m_wantsRealCountForType(false)
     , m_totalCountForTypes(0)
 
     , m_iconsForIconType({}) {}
 
-#undef RENDERTEXTURE_IMAGE_PARAMS
-
 FunnySpriteManager& FunnySpriteManager::get() {
     static FunnySpriteManager instance;
     return instance;
 }
 
-GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode) {
-    switch (gamemode) {
-        case FunnySpriteGamemode::CubePassenger:
-        case FunnySpriteGamemode::Cube: return m_cube.getTexture();
-        case FunnySpriteGamemode::Ship: return m_ship.getTexture();
-        case FunnySpriteGamemode::Ball: return m_ball.getTexture();
-        case FunnySpriteGamemode::Ufo: return m_ufo.getTexture();
-        case FunnySpriteGamemode::Wave: return m_wave.getTexture();
-        case FunnySpriteGamemode::Robot: return m_robot.getTexture();
-        case FunnySpriteGamemode::Spider: return m_spider.getTexture();
-        case FunnySpriteGamemode::Swing: return m_swing.getTexture();
-        case FunnySpriteGamemode::Jetpack: return m_jetpack.getTexture();
-        default: return 0;
+GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool dual) {
+    if (!dual) {
+        switch (gamemode) {
+            case FunnySpriteGamemode::VehiclePassenger:
+            case FunnySpriteGamemode::Cube: return m_mainIcons.m_cube.getTexture();
+            case FunnySpriteGamemode::Ship: return m_mainIcons.m_ship.getTexture();
+            case FunnySpriteGamemode::Ball: return m_mainIcons.m_ball.getTexture();
+            case FunnySpriteGamemode::Ufo: return m_mainIcons.m_ufo.getTexture();
+            case FunnySpriteGamemode::Wave: return m_mainIcons.m_wave.getTexture();
+            case FunnySpriteGamemode::Robot: return m_mainIcons.m_robot.getTexture();
+            case FunnySpriteGamemode::Spider: return m_mainIcons.m_spider.getTexture();
+            case FunnySpriteGamemode::Swing: return m_mainIcons.m_swing.getTexture();
+            case FunnySpriteGamemode::Jetpack: return m_mainIcons.m_jetpack.getTexture();
+            default: return 0;
+        }
+    } else {
+        switch (gamemode) {
+            case FunnySpriteGamemode::VehiclePassenger:
+            case FunnySpriteGamemode::Cube: return m_dualIcons.m_cube.getTexture();
+            case FunnySpriteGamemode::Ship: return m_dualIcons.m_ship.getTexture();
+            case FunnySpriteGamemode::Ball: return m_dualIcons.m_ball.getTexture();
+            case FunnySpriteGamemode::Ufo: return m_dualIcons.m_ufo.getTexture();
+            case FunnySpriteGamemode::Wave: return m_dualIcons.m_wave.getTexture();
+            case FunnySpriteGamemode::Robot: return m_dualIcons.m_robot.getTexture();
+            case FunnySpriteGamemode::Spider: return m_dualIcons.m_spider.getTexture();
+            case FunnySpriteGamemode::Swing: return m_dualIcons.m_swing.getTexture();
+            case FunnySpriteGamemode::Jetpack: return m_dualIcons.m_jetpack.getTexture();
+            default: return 0;
+        }
     }
 }
 
 GLuint FunnySpriteManager::mappingTextureForGamemode(FunnySpriteGamemode gamemode) {
     auto cache = cocos2d::CCTextureCache::get();
 
-    if (gamemode == FunnySpriteGamemode::CubePassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::VehiclePassenger) gamemode = FunnySpriteGamemode::Cube;
 
     auto texture = cache->textureForKey(fmt::format("{:04}.png"_spr, fmt::underlying(gamemode) + 1).c_str());
 
@@ -58,7 +78,7 @@ GLuint FunnySpriteManager::mappingTextureForGamemode(FunnySpriteGamemode gamemod
 GLuint FunnySpriteManager::transparencyMaskForGamemode(FunnySpriteGamemode gamemode) {
     auto cache = cocos2d::CCTextureCache::get();
 
-    if (gamemode == FunnySpriteGamemode::CubePassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::VehiclePassenger) gamemode = FunnySpriteGamemode::Cube;
 
     auto texture = cache->textureForKey(fmt::format("{:04}.png"_spr, fmt::underlying(gamemode) + 1 + 9).c_str());
 
@@ -79,6 +99,10 @@ void FunnySpriteManager::init() {
 
     // update rendered sprites (now done in menulayer!!!)
     // updateRenderedSprites();
+
+    // load ufo dome for default ufo so we can use it
+    // third param is used for unloading the icon so should be something gd won't use
+    GameManager::get()->loadIcon(1, (int)IconType::Ufo, 0xb00b1e5);
 
     // get total count for types
     for (int i = fmt::underlying(IconType::Cube); i <= fmt::underlying(IconType::Jetpack); i++) {
@@ -184,34 +208,42 @@ void FunnySpriteManager::saveIconChoice() {
 }
 
 void FunnySpriteManager::updateRenderedSprites() {
-    updateRenderedSprite(m_cube, IconType::Cube);
-    updateRenderedSprite(m_ship, IconType::Ship);
-    updateRenderedSprite(m_ball, IconType::Ball);
-    updateRenderedSprite(m_ufo, IconType::Ufo);
-    updateRenderedSprite(m_wave, IconType::Wave);
-    updateRenderedSprite(m_robot, IconType::Robot);
-    updateRenderedSprite(m_spider, IconType::Spider);
-    updateRenderedSprite(m_swing, IconType::Swing);
-    updateRenderedSprite(m_jetpack, IconType::Jetpack);
+    updateRenderedSprites(m_mainIcons, false);
+    updateRenderedSprites(m_dualIcons, true);
 }
 
-void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode) {
+void FunnySpriteManager::updateRenderedSprites(RenderTextureGroup& group, bool dual) {
+    updateRenderedSprite(group.m_cube, IconType::Cube, dual);
+    updateRenderedSprite(group.m_ship, IconType::Ship, dual);
+    updateRenderedSprite(group.m_ball, IconType::Ball, dual);
+    updateRenderedSprite(group.m_ufo, IconType::Ufo, dual);
+    updateRenderedSprite(group.m_wave, IconType::Wave, dual);
+    updateRenderedSprite(group.m_robot, IconType::Robot, dual);
+    updateRenderedSprite(group.m_spider, IconType::Spider, dual);
+    updateRenderedSprite(group.m_swing, IconType::Swing, dual);
+    updateRenderedSprite(group.m_jetpack, IconType::Jetpack, dual);
+}
+
+void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual) {
     auto simplePlayer = SimplePlayer::create(0);
     auto playerSprite = simplePlayer->getChildrenExt()[0];
 
     auto gameManager = GameManager::get();
 
     simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_iconType);
-    simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
-    simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
+    if (!dual) {
+        simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
+        simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
+    } else {
+        simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
+        simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
+    }
     simplePlayer->setGlowOutline(gameManager->colorForIdx(gameManager->getPlayerGlowColor()));
     if (!gameManager->getPlayerGlow()) simplePlayer->disableGlowOutline();
 
     // so apparently mat rendertexture is only good if you're rendering
     // something the same size as the screen so we need to resize
     // TODO: look into this?
-
-    // TODO: flip colours for dual
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     simplePlayer->setPosition(winSize / 2.f);

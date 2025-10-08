@@ -4,10 +4,8 @@
 bool HookedMenuLayer::init() {
     if (!MenuLayer::init()) return false;
 
-    FunnySpriteManager::get().updateRenderedSprites();
-
-    // only use of node ids :broken_heart:
-    // TODO: add node ids to everything!!!! (dunno where to put this)
+    auto& fsm = FunnySpriteManager::get();
+    fsm.updateRenderedSprites();
 
     auto mainMenu = getChildByID("main-menu");
     if (!mainMenu) return true;
@@ -17,14 +15,17 @@ bool HookedMenuLayer::init() {
 
     auto pos = mainMenu->convertToWorldSpace(iconKit->getPosition());
 
+    // incompat with the label you see on a new save file but whatever
     bool seen = geode::Mod::get()->getSavedValue<bool>("clicked-icon-kit", false);
     if (!seen) {
         auto iconKitText = cocos2d::CCSprite::create("icon-kit.png"_spr);
+        iconKitText->setID("icon-kit-text"_spr);
         iconKitText->setPosition(pos + cocos2d::CCPoint{ -52.f, -42.f });
         addChild(iconKitText);
     }
 
     auto newIcon = cocos2d::CCSprite::create("new-icon.png"_spr);
+    newIcon->setID("new-badge"_spr);
     newIcon->setPosition({ 60.f, 60.f });
     newIcon->setScale(.6f);
     newIcon->setRotation(9.f);

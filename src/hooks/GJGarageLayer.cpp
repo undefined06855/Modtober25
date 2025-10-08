@@ -13,8 +13,6 @@ bool HookedGJGarageLayer::init() {
     if (!GJGarageLayer::init()) return false;
     fields->m_initializing = false;
 
-    // TODO: last two tab page count / arrow visibility is broken?
-
     // set m_iconPages to set the start pages for each tab
     auto& fsm = FunnySpriteManager::get();
     for (IconType type = IconType::Cube; type <= IconType::Jetpack; type = (IconType)(fmt::underlying(type) + 1)) {
@@ -26,15 +24,16 @@ bool HookedGJGarageLayer::init() {
 
     auto winWidth = cocos2d::CCDirector::get()->getWinSize().width;
 
-    auto wrapper = CCNode::create();
-    wrapper->setPosition({ winWidth / 2.f, 235.f });
-    wrapper->setScale(1.5f);
-    addChild(wrapper);
-
     auto player = FunnySprite::create();
-    player->updateForGamemode(GameManager::get()->m_playerIconType);
-    wrapper->addChild(player);
-    m_fields->m_player = player;
+    player->setID("funny-sprite"_spr);
+    auto iconType = (FunnySpriteGamemode)GameManager::get()->m_playerIconType;
+    player->updateForGamemode(iconType);
+    player->addLimbs(iconType);
+    player->setPosition({ winWidth / 2.f, 235.f });
+    player->setScale(1.5f);
+
+    addChild(player);
+    fields->m_player = player;
 
     return true;
 }
@@ -108,7 +107,7 @@ cocos2d::CCArray* HookedGJGarageLayer::getItems(int count, int page, IconType ty
     }
 
     int offset = page * 36;
-    cocos2d::CCArray* ret = cocos2d::CCArray::createWithCapacity(36);
+    auto ret = cocos2d::CCArray::createWithCapacity(36);
     auto& icons = fsm.m_iconsForIconType[type];
     for (int i = offset; i < offset + 36; i++) {
         if (i >= icons.size()) break;
@@ -123,6 +122,7 @@ cocos2d::CCArray* HookedGJGarageLayer::getItems(int count, int page, IconType ty
 
 void HookedGJGarageLayer::onSelect(cocos2d::CCObject* sender) {
     auto cast = static_cast<CCMenuItemSpriteExtra*>(sender);
+    auto fields = m_fields.self();
 
     if (m_iconType > IconType::Jetpack) {
         GJGarageLayer::onSelect(sender);
@@ -135,21 +135,25 @@ void HookedGJGarageLayer::onSelect(cocos2d::CCObject* sender) {
         return;
     }
 
-    auto& fsm = FunnySpriteManager::get();
-
-    fsm.m_icon[m_iconType] = IconChoiceInfo{
+    FunnySpriteManager::get().m_icon[m_iconType] = IconChoiceInfo{
         .m_index = cast->getTag(),
         .m_iconType = cast->m_iconType
     };
 
-    fsm.saveIconChoice();
-    fsm.updateRenderedSprites();
-
-    m_fields->m_player->updateForGamemode(m_iconType);
+    fields->m_player->updateForGamemode((FunnySpriteGamemode)m_iconType);
+    fields->m_player->addLimbs((FunnySpriteGamemode)m_iconType);
 
     GameManager::get()->m_playerIconType = m_iconType;
 
     auto pos = cast->getParent()->convertToWorldSpace(cast->getPosition());
     m_cursor1->setVisible(true);
     m_cursor1->setPosition(pos);
+}
+
+void HookedGJGarageLayer::onBack(cocos2d::CCObject* sender) {
+    auto& fsm = FunnySpriteManager::get();
+    fsm.updateRenderedSprites();
+    fsm.saveIconChoice();
+
+    GJGarageLayer::onBack(sender);
 }

@@ -17,21 +17,26 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
             childchild->setVisible(false);
         }
 
+        auto wrap = cocos2d::CCNode::create();
+        wrap->setPosition(child->getContentSize() / 2.f);
+        child->addChild(wrap);
+
         // add our funnysprite instead of the simpleplayer
         auto gamemode = (FunnySpriteGamemode)i;
         auto funnySprite = FunnySprite::create();
         funnySprite->updateForGamemode(gamemode);
-        funnySprite->setPosition(child->getContentSize() / 2.f);
-        child->addChild(funnySprite);
+        funnySprite->setZOrder(2);
+        funnySprite->addLimbs(gamemode);
+        wrap->addChild(funnySprite);
 
         // add passenger for gamemodes that need it
-        // TODO: fix this
         if (gamemode == FunnySpriteGamemode::Ship || gamemode == FunnySpriteGamemode::Ufo) {
             auto passenger = FunnySprite::create();
-            passenger->updateForGamemode(FunnySpriteGamemode::CubePassenger);
-            funnySprite->addChild(passenger);
+            passenger->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
+            wrap->addChild(passenger);
         }
 
+        // for clicking to toggle
         if (gamemode == FunnySpriteGamemode::Ship) {
             fields->m_shipOrJetpack = funnySprite;
         }

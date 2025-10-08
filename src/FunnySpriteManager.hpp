@@ -12,6 +12,20 @@ struct UnloadedSingleIconInfo {
     int m_index;
 };
 
+struct RenderTextureGroup {
+    RenderTextureGroup();
+
+    RenderTexture m_cube;
+    RenderTexture m_ship;
+    RenderTexture m_ball;
+    RenderTexture m_ufo;
+    RenderTexture m_wave;
+    RenderTexture m_robot;
+    RenderTexture m_spider;
+    RenderTexture m_swing;
+    RenderTexture m_jetpack;
+};
+
 class FunnySpriteManager {
     FunnySpriteManager();
 public:
@@ -23,15 +37,8 @@ public:
     // then it gets passed to the FunnySprite* and it adds the sprite, then when
     // it renders it renders with the shader to make it appear like the sprite
 
-    RenderTexture m_cube;
-    RenderTexture m_ship;
-    RenderTexture m_ball;
-    RenderTexture m_ufo;
-    RenderTexture m_wave;
-    RenderTexture m_robot;
-    RenderTexture m_spider;
-    RenderTexture m_swing;
-    RenderTexture m_jetpack;
+    RenderTextureGroup m_mainIcons;
+    RenderTextureGroup m_dualIcons;
 
     std::unordered_map<IconType, IconChoiceInfo> m_icon;
 
@@ -42,11 +49,12 @@ public:
 
     void init();
     void updateRenderedSprites();
-    void updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode);
+    void updateRenderedSprites(RenderTextureGroup& group, bool dual);
+    void updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual);
 
     cocos2d::CCGLProgram* getMappingShader();
 
-    GLuint textureForGamemode(FunnySpriteGamemode gamemode);
+    GLuint textureForGamemode(FunnySpriteGamemode gamemode, bool dual);
     GLuint mappingTextureForGamemode(FunnySpriteGamemode gamemode);
     GLuint transparencyMaskForGamemode(FunnySpriteGamemode gamemode);
 

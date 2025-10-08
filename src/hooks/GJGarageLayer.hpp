@@ -19,4 +19,6 @@ class $modify(HookedGJGarageLayer, GJGarageLayer) {
     void onSelect(cocos2d::CCObject* sender);
 
     int defaultPageForIconType(IconType type);
+
+    void onBack(cocos2d::CCObject* sender);
 };

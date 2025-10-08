@@ -19,14 +19,23 @@ bool FunnySprite::init() {
     m_currentMappingTexture = 0;
     m_currentTransparencyTexture = 0;
 
+    m_dual = false;
+
+    m_limbs = {};
+
+    m_currentGamemode = FunnySpriteGamemode::None;
+
+    m_ufoDome = cocos2d::CCSprite::createWithSpriteFrameName("bird_01_3_001.png");
+    m_ufoDome->setID("dome");
+    m_ufoDome->setPosition({ 16.f, 9.f });
+    m_ufoDome->setScale(.775f);
+    m_ufoDome->setVisible(false);
+    m_ufoDome->setZOrder(-1);
+    addChild(m_ufoDome);
+
     setShaderProgram(FunnySpriteManager::get().getMappingShader());
 
     return true;
-}
-
-void FunnySprite::updateForGamemode(IconType gamemode) {
-    if (gamemode > IconType::Jetpack) return;
-    updateForGamemode((FunnySpriteGamemode)gamemode);
 }
 
 void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
@@ -48,7 +57,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Wave, {
-            .m_scale = .85f,
+            .m_scale = .9f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Robot, {
@@ -67,10 +76,9 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_scale = 1.f,
             .m_offset = { 0.f, 0.f }
         } },
-        // TODO: fix scale on mini ufo
-        { FunnySpriteGamemode::CubePassenger, {
-            .m_scale = .3f,
-            .m_offset = { 0.f, 2.f } // ! don't change x offset
+        { FunnySpriteGamemode::VehiclePassenger, {
+            .m_scale = .5f,
+            .m_offset = { 0.f, 0.f }
         } }
     };
 
@@ -78,9 +86,11 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
 
     auto& gamemodeInfo = gamemodeInfoMap.at(gamemode);
 
-    m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode);
+    m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode, m_dual);
     m_currentMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
     m_currentTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
+
+    m_ufoDome->setVisible(gamemode == FunnySpriteGamemode::Ufo);
 
     // to allow us to use setScale and stuff to copy the original icon's
     // transforms, we'll use an additional transform
@@ -88,8 +98,8 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
     transform = cocos2d::CCAffineTransformTranslate(transform, gamemodeInfo.m_offset.x, gamemodeInfo.m_offset.y);
     transform = cocos2d::CCAffineTransformScale(transform, gamemodeInfo.m_scale, gamemodeInfo.m_scale);
     setAdditionalTransform(transform);
-    m_bAdditionalTransformDirty = true;
-    updateTransform();
+
+    m_currentGamemode = gamemode;
 }
 
 // taken from icon ninja
@@ -105,6 +115,45 @@ unsigned int* getNumberOfDraws() {
 #else
     return &g_uNumberOfDraws;
 #endif
+}
+
+// violence subroutine
+void FunnySprite::addLimbs(FunnySpriteGamemode gamemode) {
+    if (gamemode != FunnySpriteGamemode::Robot && gamemode != FunnySpriteGamemode::Spider) {
+        return;
+    }
+
+    // remove any extra limbs
+    for (auto limb : m_limbs) limb->removeFromParent();
+    m_limbs.clear();
+
+    // create the victim
+    GJRobotSprite* victim;
+    if (gamemode == FunnySpriteGamemode::Spider) {
+        victim = GJSpiderSprite::create(1);
+    } else {
+        victim = GJRobotSprite::create(1);
+    }
+
+    // make the victim look nice before we take off its limbs
+    auto gameManager = GameManager::get();
+    victim->updateColor01(gameManager->colorForIdx(gameManager->getPlayerColor()));
+    victim->updateColor02(gameManager->colorForIdx(gameManager->getPlayerColor2()));
+    victim->updateGlowColor(gameManager->colorForIdx(gameManager->getPlayerGlowColor()), false);
+    victim->hideGlow();
+
+    // take off the limbs (except the head) and add to ourself
+    for (auto child : geode::cocos::CCArrayExt<cocos2d::CCNode*>(victim->m_paSprite->m_spriteParts)) {
+        if (child == victim->m_headSprite) continue;
+
+        child->setZOrder(child->getZOrder() - 3);
+        child->setPosition(child->getPosition() + cocos2d::CCPoint{ 16.f, 16.f });
+
+        // surgically detach the limbs
+        child->removeFromParent();
+        m_limbs.push_back(child);
+        addChild(child);
+    }
 }
 
 void FunnySprite::draw() {

@@ -39,6 +39,30 @@ bool HookedMenuLayer::init() {
     );
     newIcon->runAction(action);
 
+    if (fsm.m_shaderFailed) {
+        auto pop = FLAlertLayer::create(
+            "\"\"Icon\"\" Kit",
+            "The <cj>mapping shader</c> <cr>failed</c> to compile!\nThe mod "
+            "will not <cl>work!</c>",
+            "ok"
+        );
+        pop->m_scene = this;
+        pop->show();
+    }
+
+    // TODO: better separate dual icons compat?
+    if (geode::Loader::get()->isModLoaded("weebify.separate_dual_icons")) {
+        auto pop = FLAlertLayer::create(
+            "\"\"Icon\"\" Kit",
+            "<cj>Separate Dual icons</c> is installed!\nThis mod will "
+            "<cy>function</c> with it installed, but you will <cr>not</c> be "
+            "able to change your <cb>2-player icon</c>.",
+            "ok"
+        );
+        pop->m_scene = this;
+        pop->show();
+    }
+
     return true;
 }
 

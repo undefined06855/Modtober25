@@ -3,8 +3,7 @@
 
 void HookedGJGarageLayer::onModify(auto& self) {
     // TODO: find correct hook prios for all hooks
-    (void)self.setHookPriorityAfterPost("GJGargeLayer::onSelect", "hiimjustin000.more_icons");
-    (void)self.setHookPriorityAfterPost("GJGargeLayer::setupPage", "hiimjustin000.more_icons");
+    (void)self.setHookPriorityBeforePre("GJGarageLayer::onSelect", "hiimjustin000.more_icons");
 }
 
 bool HookedGJGarageLayer::init() {
@@ -129,16 +128,31 @@ void HookedGJGarageLayer::onSelect(cocos2d::CCObject* sender) {
         return;
     }
 
+    if (cast->getUserObject("hiimjustin000.more_icons/name")) {
+        // more icons icon
+        GJGarageLayer::onSelect(sender);
+        FunnySpriteManager::get().updateRenderedSprites();
+        fields->m_player->updateForGamemode((FunnySpriteGamemode)m_iconType);
+        fields->m_player->addLimbs((FunnySpriteGamemode)m_iconType);
+        return;
+    }
+
     if (!GameManager::get()->isIconUnlocked(cast->getTag(), cast->m_iconType)) {
         auto unlock = GameManager::get()->iconTypeToUnlockType(cast->m_iconType);
         showUnlockPopup(cast->getTag(), unlock);
         return;
     }
 
-    FunnySpriteManager::get().m_icon[m_iconType] = IconChoiceInfo{
+    auto& fsm = FunnySpriteManager::get();
+
+    fsm.m_icon[m_iconType] = IconChoiceInfo{
         .m_index = cast->getTag(),
         .m_iconType = cast->m_iconType
     };
+
+    // update sprites
+    fsm.updateRenderedSprites();
+    fsm.saveIconChoice();
 
     fields->m_player->updateForGamemode((FunnySpriteGamemode)m_iconType);
     fields->m_player->addLimbs((FunnySpriteGamemode)m_iconType);
@@ -154,6 +168,5 @@ void HookedGJGarageLayer::onBack(cocos2d::CCObject* sender) {
     auto& fsm = FunnySpriteManager::get();
     fsm.updateRenderedSprites();
     fsm.saveIconChoice();
-
     GJGarageLayer::onBack(sender);
 }

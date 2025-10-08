@@ -23,7 +23,6 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     gm->setPlayerRobot(origRobot);
     gm->setPlayerSpider(origSpider);
 
-    // TODO: icon gradients + fine outline compat (just disable)
     // TODO: more icons compat?
 
     // TODO: player ghost trail effect still default

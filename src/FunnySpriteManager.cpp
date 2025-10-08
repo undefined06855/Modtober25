@@ -1,5 +1,6 @@
 #include "FunnySpriteManager.hpp"
 #include "shaders.hpp"
+#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
@@ -22,10 +23,14 @@ FunnySpriteManager::FunnySpriteManager()
     : m_mainIcons()
     , m_dualIcons()
 
+    , m_icon({})
+
     , m_wantsRealCountForType(false)
     , m_totalCountForTypes(0)
 
-    , m_iconsForIconType({}) {}
+    , m_iconsForIconType({})
+
+    , m_shaderFailed(false) {}
 
 FunnySpriteManager& FunnySpriteManager::get() {
     static FunnySpriteManager instance;
@@ -174,7 +179,8 @@ cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
         geode::log::error("Shader failed to load!");
         geode::log::error("{}", mappingShader->fragmentShaderLog()); // probably going to crash anyway
 
-        // TODO: show flalertlayer on menulayer or something
+        m_shaderFailed = true;
+        return nullptr;
     }
 
     mappingShader->addAttribute(kCCAttributeNamePosition, cocos2d::kCCVertexAttrib_Position);
@@ -230,14 +236,50 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 
     auto gameManager = GameManager::get();
 
-    simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_iconType);
+    // this was so nice and beautiful before MOD COMPATIBILITY :(
+
+    if (dual && geode::Loader::get()->isModLoaded("weebify.separate_dual_icons")) {
+        auto mod = geode::Loader::get()->getLoadedMod("weebify.separate_dual_icons");
+
+        static const std::unordered_map<IconType, const char*> iconTypeToName = {
+            { IconType::Cube, "cube" },
+            { IconType::Ship, "ship" },
+            { IconType::Ball, "roll" },
+            { IconType::Ufo, "ufo" },
+            { IconType::Wave, "dart" },
+            { IconType::Robot, "robot" },
+            { IconType::Spider, "spider" },
+            { IconType::Swing, "swing" },
+            { IconType::Jetpack, "jetpack" }
+        };
+
+        auto settingName = iconTypeToName.at(m_icon[gamemode].m_iconType);
+        simplePlayer->updatePlayerFrame(mod->getSavedValue<int64_t>(settingName), m_icon[gamemode].m_iconType);
+    } else {
+        simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_iconType);
+    }
+
+    if (MoreIcons::loaded()) {
+        MoreIcons::updateSimplePlayer(simplePlayer, gamemode, dual);
+    }
+
     if (!dual) {
         simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
         simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
     } else {
-        simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
-        simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
+        if (geode::Loader::get()->isModLoaded("weebify.separate_dual_icons")) {
+            auto mod = geode::Loader::get()->getLoadedMod("weebify.separate_dual_icons");
+            auto col1 = mod->getSavedValue<int64_t>("color1");
+            auto col2 = mod->getSavedValue<int64_t>("color2");
+
+            simplePlayer->setColor(gameManager->colorForIdx(col1));
+            simplePlayer->setSecondColor(gameManager->colorForIdx(col2));
+        } else {
+            simplePlayer->setColor(gameManager->colorForIdx(gameManager->getPlayerColor2()));
+            simplePlayer->setSecondColor(gameManager->colorForIdx(gameManager->getPlayerColor()));
+        }
     }
+
     simplePlayer->setGlowOutline(gameManager->colorForIdx(gameManager->getPlayerGlowColor()));
     if (!gameManager->getPlayerGlow()) simplePlayer->disableGlowOutline();
 

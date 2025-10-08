@@ -47,6 +47,8 @@ public:
 
     std::unordered_map<IconType, std::vector<UnloadedSingleIconInfo>> m_iconsForIconType;
 
+    bool m_shaderFailed;
+
     void init();
     void updateRenderedSprites();
     void updateRenderedSprites(RenderTextureGroup& group, bool dual);

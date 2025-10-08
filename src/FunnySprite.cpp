@@ -45,7 +45,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Ship, {
-            .m_scale = 1.325f,
+            .m_scale = 1.3f,
             .m_offset = { 0.f, -3.f }
         } },
         { FunnySpriteGamemode::Ball, {
@@ -61,7 +61,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Robot, {
-            .m_scale = 1.1f,
+            .m_scale = 1.06f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Spider, {

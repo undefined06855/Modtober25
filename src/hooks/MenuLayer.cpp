@@ -51,16 +51,18 @@ bool HookedMenuLayer::init() {
     }
 
     // TODO: better separate dual icons compat?
-    if (geode::Loader::get()->isModLoaded("weebify.separate_dual_icons")) {
+    bool seenDualIconsWarning = geode::Mod::get()->getSavedValue<bool>("warned-dual-icons", false);
+    if (!seenDualIconsWarning && geode::Loader::get()->isModLoaded("weebify.separate_dual_icons")) {
         auto pop = FLAlertLayer::create(
             "\"\"Icon\"\" Kit",
-            "<cj>Separate Dual icons</c> is installed!\nThis mod will "
+            "<cj>Separate Dual Icons</c> is installed!\nThis mod will "
             "<cy>function</c> with it installed, but you will <cr>not</c> be "
             "able to change your <cb>2-player icon</c>.",
             "ok"
         );
         pop->m_scene = this;
         pop->show();
+        geode::Mod::get()->setSavedValue("warned-dual-icons", true);
     }
 
     return true;

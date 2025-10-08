@@ -287,6 +287,9 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     // something the same size as the screen so we need to resize
     // TODO: look into this?
 
+    // TODO: note: icon gradients queues in main thread
+    // https://github.com/Zilko/icon-gradients/blob/main/src/Hooks/SimplePlayer.cpp#L19
+
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     simplePlayer->setPosition(winSize / 2.f);
     if (gameManager->getPlayerGlow()) {

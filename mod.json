@@ -8,7 +8,7 @@
     },
 
     "version": "v1.0.0",
-    "id": "undefined0.icon_kit",
+    "id": "undefined0.icon-kit",
     "name": "\"\"Icon\"\" Kit",
     "developer": "undefined0",
     "description": "Allows you to select any icon type for any gamemode!",
@@ -31,6 +31,21 @@
         "hiimjustin000.more_icons": {
             "importance": "suggested",
             "version": "v1.14.7"
+        }
+    },
+
+    "incompatibilities": {
+        "saritahhh.icon_preview": {
+            "version": "*",
+            "importance": "breaking"
+        },
+        "zilko.icon_gradients": {
+            "version": "*",
+            "importance": "conflicting"
+        },
+        "alphalaneous.fine_outline": {
+            "version": "*",
+            "importance": "conflicting"
         }
     }
 }

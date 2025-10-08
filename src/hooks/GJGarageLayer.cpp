@@ -4,6 +4,7 @@
 void HookedGJGarageLayer::onModify(auto& self) {
     // TODO: find correct hook prios for all hooks
     (void)self.setHookPriorityBeforePre("GJGarageLayer::onSelect", "hiimjustin000.more_icons");
+    (void)self.setHookPriorityAfterPost("GJGarageLayer::init", "weebify.separate_dual_icons");
 }
 
 bool HookedGJGarageLayer::init() {
@@ -33,6 +34,9 @@ bool HookedGJGarageLayer::init() {
 
     addChild(player);
     fields->m_player = player;
+
+    auto player2 = getChildByID("player2-icon");
+    if (player2) player2->setVisible(false);
 
     return true;
 }

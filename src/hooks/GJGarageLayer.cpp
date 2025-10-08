@@ -2,7 +2,6 @@
 #include "../FunnySpriteManager.hpp"
 
 void HookedGJGarageLayer::onModify(auto& self) {
-    // TODO: find correct hook prios for all hooks
     (void)self.setHookPriorityBeforePre("GJGarageLayer::onSelect", "hiimjustin000.more_icons");
     (void)self.setHookPriorityAfterPost("GJGarageLayer::init", "weebify.separate_dual_icons");
 }
@@ -70,7 +69,7 @@ void HookedGJGarageLayer::setupPage(int page, IconType type) {
 
     geode::log::debug("setting up page {} for icon type {}", page, fmt::underlying(type));
 
-    // TODO: this randomly crashes if you click death effects -> trails -> any tab
+    // TODO: this randomly SOMETIMES crashes if you click death effects -> trails -> any tab
     GJGarageLayer::setupPage(page, type);
 
     if (type > IconType::Jetpack) return;

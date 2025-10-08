@@ -23,8 +23,6 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     gm->setPlayerRobot(origRobot);
     gm->setPlayerSpider(origSpider);
 
-    // TODO: more icons compat?
-
     // TODO: player ghost trail effect still default
 
     auto fields = m_fields.self();

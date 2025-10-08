@@ -285,7 +285,7 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 
     // so apparently mat rendertexture is only good if you're rendering
     // something the same size as the screen so we need to resize
-    // TODO: look into this?
+    // TODO: look into mat rendertexture?
 
     // TODO: note: icon gradients queues in main thread
     // https://github.com/Zilko/icon-gradients/blob/main/src/Hooks/SimplePlayer.cpp#L19

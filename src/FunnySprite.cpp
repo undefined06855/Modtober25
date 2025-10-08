@@ -119,13 +119,13 @@ unsigned int* getNumberOfDraws() {
 
 // violence subroutine
 void FunnySprite::addLimbs(FunnySpriteGamemode gamemode) {
-    if (gamemode != FunnySpriteGamemode::Robot && gamemode != FunnySpriteGamemode::Spider) {
-        return;
-    }
-
     // remove any extra limbs
     for (auto limb : m_limbs) limb->removeFromParent();
     m_limbs.clear();
+
+    if (gamemode != FunnySpriteGamemode::Robot && gamemode != FunnySpriteGamemode::Spider) {
+        return;
+    }
 
     // create the victim
     GJRobotSprite* victim;

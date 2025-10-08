@@ -23,15 +23,20 @@ bool HookedGJGarageLayer::init() {
 
     auto winWidth = cocos2d::CCDirector::get()->getWinSize().width;
 
+    // still not entirely sure why this is needed but
+    auto wrap = cocos2d::CCNode::create();
+    wrap->setID("funny-sprite-wrap"_spr);
+    wrap->setPosition({ winWidth / 2.f, 235.f });
+    wrap->setScale(1.5f);
+    addChild(wrap);
+
     auto player = FunnySprite::create();
     player->setID("funny-sprite"_spr);
     auto iconType = (FunnySpriteGamemode)GameManager::get()->m_playerIconType;
     player->updateForGamemode(iconType);
     player->addLimbs(iconType);
-    player->setPosition({ winWidth / 2.f, 235.f });
-    player->setScale(1.5f);
 
-    addChild(player);
+    wrap->addChild(player);
     fields->m_player = player;
 
     auto player2 = getChildByID("player2-icon");

@@ -1,5 +1,6 @@
 #include "CharacterColorPage.hpp"
 #include "../FunnySpriteManager.hpp"
+#include "GJGarageLayer.hpp"
 
 bool HookedCharacterColorPage::init() {
     if (!CharacterColorPage::init()) return false;
@@ -90,6 +91,10 @@ void HookedCharacterColorPage::updateIconColors() {
     auto fields = m_fields.self();
     if (fields->m_robot) fields->m_robot->addLimbs(FunnySpriteGamemode::Robot);
     if (fields->m_spider) fields->m_spider->addLimbs(FunnySpriteGamemode::Spider);
+
+    // update gjgaragelayer limbs
+    auto garage = static_cast<HookedGJGarageLayer*>(cocos2d::CCScene::get()->getChildByType<GJGarageLayer>(0));
+    if (garage) garage->updateLimbs();
 }
 
 void HookedCharacterColorPage::toggleShip(cocos2d::CCObject* sender) {

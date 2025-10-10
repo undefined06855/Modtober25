@@ -181,3 +181,8 @@ void HookedGJGarageLayer::onBack(cocos2d::CCObject* sender) {
     fsm.saveIconChoice();
     GJGarageLayer::onBack(sender);
 }
+
+void HookedGJGarageLayer::updateLimbs() {
+    auto player = m_fields->m_player;
+    player->addLimbs(player->m_currentGamemode);
+}

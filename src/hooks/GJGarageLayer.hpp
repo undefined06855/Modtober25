@@ -21,4 +21,6 @@ class $modify(HookedGJGarageLayer, GJGarageLayer) {
     int defaultPageForIconType(IconType type);
 
     void onBack(cocos2d::CCObject* sender);
+
+    void updateLimbs();
 };

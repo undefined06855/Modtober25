@@ -25,8 +25,6 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     gm->setPlayerRobot(origRobot);
     gm->setPlayerSpider(origSpider);
 
-    // TODO: player ghost trail effect still default
-
     auto fields = m_fields.self();
 
     auto funnySprite = FunnySprite::create();
@@ -48,6 +46,11 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     fields->m_isDualUpdated = false;
 
     updateShitVisibility();
+
+    // :(
+    geode::Loader::get()->queueInMainThread([self = geode::WeakRef(this)] {
+        if (auto lock = self.lock()) lock->updateShitVisibility();
+    });
 
     return true;
 }

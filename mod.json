@@ -38,14 +38,6 @@
         "saritahhh.icon_preview": {
             "version": "*",
             "importance": "breaking"
-        },
-        "zilko.icon_gradients": {
-            "version": "*",
-            "importance": "conflicting"
-        },
-        "alphalaneous.fine_outline": {
-            "version": "*",
-            "importance": "conflicting"
         }
     }
 }

@@ -20,12 +20,14 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
         }
 
         auto wrap = cocos2d::CCNode::create();
+        wrap->setID("icon-wrap"_spr);
         wrap->setPosition(child->getContentSize() / 2.f);
         child->addChild(wrap);
 
         // add our funnysprite instead of the simpleplayer
         auto gamemode = (FunnySpriteGamemode)i;
         auto funnySprite = FunnySprite::create();
+        funnySprite->setID("funny-sprite");
         funnySprite->updateForGamemode(gamemode);
         funnySprite->setZOrder(2);
         funnySprite->addLimbs(gamemode);
@@ -34,6 +36,7 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
         // add passenger for gamemodes that need it
         if (gamemode == FunnySpriteGamemode::Ship || gamemode == FunnySpriteGamemode::Ufo) {
             auto passenger = FunnySprite::create();
+            passenger->setID("funny-passenger-sprite");
             passenger->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
             wrap->addChild(passenger);
         }

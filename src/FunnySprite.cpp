@@ -46,7 +46,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Ship, {
-            .m_scale = 1.3f,
+            .m_scale = 1.15f,
             .m_offset = { 0.f, -3.f }
         } },
         { FunnySpriteGamemode::Ball, {
@@ -103,21 +103,6 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
     m_currentGamemode = gamemode;
 }
 
-// taken from icon ninja
-unsigned int* getNumberOfDraws() {
-    // compiler yells at me if i use #elifdef :broken_heart:
-    // thanks to jasmine for ALL of these
-#if defined(GEODE_IS_MACOS)
-    static_assert(GEODE_COMP_GD_VERSION == 22074, "Please update macOS offsets");
-    return reinterpret_cast<unsigned int*>(geode::base::get() + GEODE_ARM_MAC(0x8b0f60) GEODE_INTEL_MAC(0x98bf30));
-#elif defined(GEODE_IS_IOS)
-    static_assert(GEODE_COMP_GD_VERSION == 22074, "Please update iOS offsets");
-    return reinterpret_cast<unsigned int*>(geode::base::get() + 0x8791d0);
-#else
-    return &g_uNumberOfDraws;
-#endif
-}
-
 // violence subroutine
 void FunnySprite::addLimbs(FunnySpriteGamemode gamemode) {
     // remove any extra limbs
@@ -155,6 +140,21 @@ void FunnySprite::addLimbs(FunnySpriteGamemode gamemode) {
         m_limbs.push_back(child);
         addChild(child);
     }
+}
+
+// taken from icon ninja
+unsigned int* getNumberOfDraws() {
+    // compiler yells at me if i use #elifdef :broken_heart:
+    // thanks to jasmine for ALL of these
+#if defined(GEODE_IS_MACOS)
+    static_assert(GEODE_COMP_GD_VERSION == 22074, "Please update macOS offsets");
+    return reinterpret_cast<unsigned int*>(geode::base::get() + GEODE_ARM_MAC(0x8b0f60) GEODE_INTEL_MAC(0x98bf30));
+#elif defined(GEODE_IS_IOS)
+    static_assert(GEODE_COMP_GD_VERSION == 22074, "Please update iOS offsets");
+    return reinterpret_cast<unsigned int*>(geode::base::get() + 0x8791d0);
+#else
+    return &g_uNumberOfDraws;
+#endif
 }
 
 void FunnySprite::draw() {

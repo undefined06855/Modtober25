@@ -121,6 +121,8 @@ GLuint FunnySpriteManager::transparencyMaskForGamemode(FunnySpriteGamemode gamem
     else return texture->getName();
 }
 
+// the result of this is set as the playerobject's m_iconSprite's texture for
+// the ghost trail to copy
 cocos2d::CCTexture2D* FunnySpriteManager::trailTextureForGamemode(FunnySpriteGamemode gamemode) {
     switch (gamemode) {
         case FunnySpriteGamemode::None: return nullptr;
@@ -176,8 +178,6 @@ void FunnySpriteManager::init() {
                     .m_index = index,
                     .m_iconType = (IconType)ofIconType
                 };
-
-                co_return geode::Ok();
             });
         }
     } else {
@@ -386,15 +386,21 @@ void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture
     auto renderTexture = RenderTexture(128, 128, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE);
 
     auto funnySprite = FunnySprite::create();
-    funnySprite->m_mainOnly = true;
+    funnySprite->m_mainOnly = true; // only place where this member is used
     funnySprite->updateForGamemode((FunnySpriteGamemode)gamemode);
-    // funnySprite->addLimbs((FunnySpriteGamemode)gamemode);
     funnySprite->setFlipY(true);
+    // don't add limbs!
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     funnySprite->setPosition(winSize / 2.f);
     funnySprite->setScaleX(winSize.width / (funnySprite->getContentWidth() + .5f));
     funnySprite->setScaleY(winSize.height / (funnySprite->getContentHeight() + .5f));
+
+    if (gamemode == IconType::Robot) {
+        // not sure why this is needed but whatever i guess
+        // still not completely aligned even if i do this
+        funnySprite->setPosition(funnySprite->getPosition() + cocos2d::CCPoint{ 0.f, 100.f });
+    }
 
     renderTexture.capture(funnySprite);
 

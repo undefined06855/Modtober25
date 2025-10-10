@@ -3,6 +3,8 @@
 void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
     ProfilePage::loadPageFromUserInfo(info);
 
+    if (!info->isCurrentUser()) return;
+
     auto menu = m_mainLayer->getChildByID("player-menu");
     if (!menu) return;
 

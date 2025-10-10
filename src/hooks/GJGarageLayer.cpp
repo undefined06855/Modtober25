@@ -42,6 +42,9 @@ bool HookedGJGarageLayer::init() {
     auto player2 = getChildByID("player2-icon");
     if (player2) player2->setVisible(false);
 
+    // just in case some mod sets icons outside of gjgaragelayer onSelect
+    fsm.updateRenderedSprites();
+
     return true;
 }
 

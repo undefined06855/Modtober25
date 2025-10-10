@@ -3,12 +3,13 @@ by [undefined0](user:13351341)
 
 ---
 
-This mod simply allows you to set any icon for any gamemode... with varying results.
+This mod simply allows you to set any icon for any gamemode, with varying results.
 
 
-The mod will attempt to warp the icon to fit the gamemode, such as rounding out
-cube icons for ball, scaling up waves for cube and so on which can lead to some...
-certainly interesting results depending on what you choose!
+It will attempt to warp the icon to fit the gamemode, such as rounding out cube
+icons for ball, scaling up waves for cube and so on which can lead to some
+certainly breathtaking, beautiful, gorgeous, attractive, pretty, prepossessing,
+charming, delightful, beautiful, alluring results depending on what you choose!
 
 
 Mod support:

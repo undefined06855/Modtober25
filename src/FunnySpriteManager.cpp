@@ -1,6 +1,7 @@
 #include "FunnySpriteManager.hpp"
 #include "shaders.hpp"
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+#include <Geode/utils/coro.hpp>
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
@@ -19,9 +20,21 @@ RenderTextureGroup::RenderTextureGroup()
 
 #undef RENDERTEXTURE_IMAGE_PARAMS
 
+Texture2DGroup::Texture2DGroup()
+    : m_cube(nullptr)
+    , m_ship(nullptr)
+    , m_ball(nullptr)
+    , m_ufo(nullptr)
+    , m_wave(nullptr)
+    , m_robot(nullptr)
+    , m_spider(nullptr)
+    , m_swing(nullptr)
+    , m_jetpack(nullptr) {}
+
 FunnySpriteManager::FunnySpriteManager()
     : m_mainIcons()
     , m_dualIcons()
+    , m_mainIconsMainOnly()
 
     , m_icon({})
 
@@ -37,7 +50,24 @@ FunnySpriteManager& FunnySpriteManager::get() {
     return instance;
 }
 
-GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool dual) {
+GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool dual, bool mainOnly) {
+    if (mainOnly) {
+        // for ghost trail textures
+        switch (gamemode) {
+            case FunnySpriteGamemode::VehiclePassenger:
+            case FunnySpriteGamemode::Cube: return m_mainIconsMainOnly.m_cube.getTexture();
+            case FunnySpriteGamemode::Ship: return m_mainIconsMainOnly.m_ship.getTexture();
+            case FunnySpriteGamemode::Ball: return m_mainIconsMainOnly.m_ball.getTexture();
+            case FunnySpriteGamemode::Ufo: return m_mainIconsMainOnly.m_ufo.getTexture();
+            case FunnySpriteGamemode::Wave: return m_mainIconsMainOnly.m_wave.getTexture();
+            case FunnySpriteGamemode::Robot: return m_mainIconsMainOnly.m_robot.getTexture();
+            case FunnySpriteGamemode::Spider: return m_mainIconsMainOnly.m_spider.getTexture();
+            case FunnySpriteGamemode::Swing: return m_mainIconsMainOnly.m_swing.getTexture();
+            case FunnySpriteGamemode::Jetpack: return m_mainIconsMainOnly.m_jetpack.getTexture();
+            default: return 0;
+        }
+    }
+
     if (!dual) {
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
@@ -91,6 +121,22 @@ GLuint FunnySpriteManager::transparencyMaskForGamemode(FunnySpriteGamemode gamem
     else return texture->getName();
 }
 
+cocos2d::CCTexture2D* FunnySpriteManager::trailTextureForGamemode(FunnySpriteGamemode gamemode) {
+    switch (gamemode) {
+        case FunnySpriteGamemode::None: return nullptr;
+        case FunnySpriteGamemode::Cube: return m_ghostTrailIcons.m_cube;
+        case FunnySpriteGamemode::Ship: return m_ghostTrailIcons.m_ship;
+        case FunnySpriteGamemode::Ball: return m_ghostTrailIcons.m_ball;
+        case FunnySpriteGamemode::Ufo: return m_ghostTrailIcons.m_ufo;
+        case FunnySpriteGamemode::Wave: return m_ghostTrailIcons.m_wave;
+        case FunnySpriteGamemode::Robot: return m_ghostTrailIcons.m_robot;
+        case FunnySpriteGamemode::Spider: return m_ghostTrailIcons.m_spider;
+        case FunnySpriteGamemode::Swing: return m_ghostTrailIcons.m_swing;
+        case FunnySpriteGamemode::Jetpack: return m_ghostTrailIcons.m_jetpack;
+        case FunnySpriteGamemode::VehiclePassenger: return nullptr;
+    }
+}
+
 void FunnySpriteManager::init() {
     // add textures to cache
     auto cache = cocos2d::CCTextureCache::get();
@@ -120,15 +166,19 @@ void FunnySpriteManager::init() {
         geode::log::info("getting icon data from mod config");
         auto array = geode::Mod::get()->getSavedValue<matjson::Value>("icons");
         for (int i = 0; i < array.size(); i++) {
-            int index = array[i]["index"].asInt().unwrapOr(0);
-            int ofIconType = array[i]["of"].asUInt().unwrapOr(0);
+            (void)($try<> {
+                int index = co_await array[i]["index"].asInt();
+                int ofIconType = co_await array[i]["of"].asUInt();
 
-            geode::log::info("{} icon is {} of {}", i, index, ofIconType);
+                geode::log::info("{} icon is {} of {}", i, index, ofIconType);
 
-            m_icon[(IconType)i] = IconChoiceInfo{
-                .m_index = index,
-                .m_iconType = (IconType)ofIconType
-            };
+                m_icon[(IconType)i] = IconChoiceInfo{
+                    .m_index = index,
+                    .m_iconType = (IconType)ofIconType
+                };
+
+                co_return geode::Ok();
+            });
         }
     } else {
         // get from save data
@@ -214,23 +264,37 @@ void FunnySpriteManager::saveIconChoice() {
 }
 
 void FunnySpriteManager::updateRenderedSprites() {
-    updateRenderedSprites(m_mainIcons, false);
-    updateRenderedSprites(m_dualIcons, true);
+    updateRenderedSprites(m_mainIcons, false, false);
+    updateRenderedSprites(m_dualIcons, true, false);
+    updateRenderedSprites(m_mainIconsMainOnly, false, true);
+    updateRenderedTrailSprites(m_ghostTrailIcons);
 }
 
-void FunnySpriteManager::updateRenderedSprites(RenderTextureGroup& group, bool dual) {
-    updateRenderedSprite(group.m_cube, IconType::Cube, dual);
-    updateRenderedSprite(group.m_ship, IconType::Ship, dual);
-    updateRenderedSprite(group.m_ball, IconType::Ball, dual);
-    updateRenderedSprite(group.m_ufo, IconType::Ufo, dual);
-    updateRenderedSprite(group.m_wave, IconType::Wave, dual);
-    updateRenderedSprite(group.m_robot, IconType::Robot, dual);
-    updateRenderedSprite(group.m_spider, IconType::Spider, dual);
-    updateRenderedSprite(group.m_swing, IconType::Swing, dual);
-    updateRenderedSprite(group.m_jetpack, IconType::Jetpack, dual);
+void FunnySpriteManager::updateRenderedSprites(RenderTextureGroup& group, bool dual, bool mainOnly) {
+    updateRenderedSprite(group.m_cube, IconType::Cube, dual, mainOnly);
+    updateRenderedSprite(group.m_ship, IconType::Ship, dual, mainOnly);
+    updateRenderedSprite(group.m_ball, IconType::Ball, dual, mainOnly);
+    updateRenderedSprite(group.m_ufo, IconType::Ufo, dual, mainOnly);
+    updateRenderedSprite(group.m_wave, IconType::Wave, dual, mainOnly);
+    updateRenderedSprite(group.m_robot, IconType::Robot, dual, mainOnly);
+    updateRenderedSprite(group.m_spider, IconType::Spider, dual, mainOnly);
+    updateRenderedSprite(group.m_swing, IconType::Swing, dual, mainOnly);
+    updateRenderedSprite(group.m_jetpack, IconType::Jetpack, dual, mainOnly);
 }
 
-void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual) {
+void FunnySpriteManager::updateRenderedTrailSprites(Texture2DGroup& group) {
+    updateRenderedTrailSprite(group.m_cube, IconType::Cube);
+    updateRenderedTrailSprite(group.m_ship, IconType::Ship);
+    updateRenderedTrailSprite(group.m_ball, IconType::Ball);
+    updateRenderedTrailSprite(group.m_ufo, IconType::Ufo);
+    updateRenderedTrailSprite(group.m_wave, IconType::Wave);
+    updateRenderedTrailSprite(group.m_robot, IconType::Robot);
+    updateRenderedTrailSprite(group.m_spider, IconType::Spider);
+    updateRenderedTrailSprite(group.m_swing, IconType::Swing);
+    updateRenderedTrailSprite(group.m_jetpack, IconType::Jetpack);
+}
+
+SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dual) {
     auto simplePlayer = SimplePlayer::create(0);
     auto playerSprite = simplePlayer->getChildrenExt()[0];
 
@@ -283,6 +347,15 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     simplePlayer->setGlowOutline(gameManager->colorForIdx(gameManager->getPlayerGlowColor()));
     if (!gameManager->getPlayerGlow()) simplePlayer->disableGlowOutline();
 
+    return simplePlayer;
+}
+
+void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly) {
+    auto simplePlayer = createSimplePlayer(gamemode, dual);
+    auto playerSprite = simplePlayer->getChildrenExt()[0];
+
+    auto gameManager = GameManager::get();
+
     // so apparently mat rendertexture is only good if you're rendering
     // something the same size as the screen so we need to resize
     // TODO: look into mat rendertexture?
@@ -291,18 +364,41 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     // https://github.com/Zilko/icon-gradients/blob/main/src/Hooks/SimplePlayer.cpp#L19
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
-    simplePlayer->setPosition(winSize / 2.f);
+    playerSprite->setPosition(winSize / 2.f);
     if (gameManager->getPlayerGlow()) {
         // add more space for glow
-        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + 2.5f));
-        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + 2.5f));
+        playerSprite->setScaleX(winSize.width / (playerSprite->getContentWidth() + 2.5f));
+        playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 2.5f));
     } else {
-        simplePlayer->setScaleX(winSize.width / (playerSprite->getContentWidth() + .5f));
-        simplePlayer->setScaleY(winSize.height / (playerSprite->getContentHeight() + .5f));
+        playerSprite->setScaleX(winSize.width / (playerSprite->getContentWidth() + .5f));
+        playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + .5f));
     }
 
-    renderTexture.capture(simplePlayer);
+    if (mainOnly) {
+        playerSprite->removeAllChildren();
+    }
+
+    renderTexture.capture(playerSprite);
     simplePlayer->release();
+}
+
+void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode) {
+    auto renderTexture = RenderTexture(128, 128, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE);
+
+    auto funnySprite = FunnySprite::create();
+    funnySprite->m_mainOnly = true;
+    funnySprite->updateForGamemode((FunnySpriteGamemode)gamemode);
+    // funnySprite->addLimbs((FunnySpriteGamemode)gamemode);
+    funnySprite->setFlipY(true);
+
+    auto winSize = cocos2d::CCDirector::get()->getWinSize();
+    funnySprite->setPosition(winSize / 2.f);
+    funnySprite->setScaleX(winSize.width / (funnySprite->getContentWidth() + .5f));
+    funnySprite->setScaleY(winSize.height / (funnySprite->getContentHeight() + .5f));
+
+    renderTexture.capture(funnySprite);
+
+    texture = renderTexture.intoTexture();
 }
 
 int FunnySpriteManager::realCountForType(IconType type) {

@@ -1,5 +1,6 @@
 #pragma once
 #include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/CCSprite.hpp>
 #include "../FunnySprite.hpp"
 
 // see HookedPlayerObject::patchBatchNode
@@ -10,7 +11,7 @@ public:
 };
 
 enum class Gamemode {
-    None = -1, // -1 not 0 for None is sad
+    None = -1,
     Cube, Ship, Ball, Ufo, Wave, Robot, Spider, Swing
 };
 
@@ -43,6 +44,8 @@ class $modify(HookedPlayerObject, PlayerObject) {
     void createSpider(int frame);
 
     void update(float dt);
+
+    void updateShitVisibility();
 
     void patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode);
 };

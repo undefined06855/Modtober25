@@ -1,4 +1,6 @@
 #include "PlayerObject.hpp"
+#include "../FunnySpriteManager.hpp"
+#include <Geode/utils/coro.hpp>
 
 void FakeSpriteBatchNode::draw() { CCNode::draw(); }
 void FakeSpriteBatchNode::visit() { CCNode::visit(); }
@@ -44,6 +46,8 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
 
     fields->m_currentGamemode = Gamemode::None;
     fields->m_isDualUpdated = false;
+
+    updateShitVisibility();
 
     return true;
 }
@@ -145,6 +149,9 @@ void HookedPlayerObject::updateFunnySprite() {
 
         default: break;
     }
+
+    m_iconSprite->setTexture(FunnySpriteManager::get().trailTextureForGamemode(funnySpriteGamemode));
+    m_iconSprite->setTextureRect({ 0.f, 0.f, 32.f, 32.f });
 }
 
 void HookedPlayerObject::createRobot(int frame) {
@@ -193,6 +200,26 @@ void HookedPlayerObject::update(float dt) {
 
     auto fields = m_fields.self();
 
+    updateShitVisibility();
+
+    if (m_isSecondPlayer && !fields->m_isDualUpdated) {
+        fields->m_funnySprite->m_dual = true;
+        fields->m_funnyVehicleSprite->m_dual = true;
+        fields->m_funnyRobotSprite->m_dual = true;
+        fields->m_funnySpiderSprite->m_dual = true;
+
+        fields->m_funnySprite->updateForGamemode(fields->m_funnySprite->m_currentGamemode);
+        fields->m_funnyVehicleSprite->updateForGamemode(fields->m_funnyVehicleSprite->m_currentGamemode);
+        fields->m_funnySpiderSprite->updateForGamemode(FunnySpriteGamemode::Spider);
+        fields->m_funnyRobotSprite->updateForGamemode(FunnySpriteGamemode::Robot);
+
+        fields->m_isDualUpdated = true;
+    }
+}
+
+void HookedPlayerObject::updateShitVisibility() {
+    auto fields = m_fields.self();
+
     if (m_iconSprite) m_iconSprite->setVisible(false);
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
 
@@ -213,22 +240,6 @@ void HookedPlayerObject::update(float dt) {
 
     fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
     fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
-
-
-    if (m_isSecondPlayer && !fields->m_isDualUpdated) {
-        fields->m_funnySprite->m_dual = true;
-        fields->m_funnyVehicleSprite->m_dual = true;
-        fields->m_funnyRobotSprite->m_dual = true;
-        fields->m_funnySpiderSprite->m_dual = true;
-
-        fields->m_funnySprite->updateForGamemode(fields->m_funnySprite->m_currentGamemode);
-        fields->m_funnyVehicleSprite->updateForGamemode(fields->m_funnyVehicleSprite->m_currentGamemode);
-        fields->m_funnySpiderSprite->updateForGamemode(FunnySpriteGamemode::Spider);
-        fields->m_funnyRobotSprite->updateForGamemode(FunnySpriteGamemode::Robot);
-
-        fields->m_isDualUpdated = true;
-    }
-
 }
 
 void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {

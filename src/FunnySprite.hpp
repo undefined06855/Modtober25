@@ -18,6 +18,7 @@ public:
     bool init();
 
     bool m_dual;
+    bool m_mainOnly;
 
     GLuint m_currentTexture;
     GLuint m_currentMappingTexture;

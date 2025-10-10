@@ -20,6 +20,7 @@ bool FunnySprite::init() {
     m_currentTransparencyTexture = 0;
 
     m_dual = false;
+    m_mainOnly = false;
 
     m_limbs = {};
 
@@ -86,7 +87,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
 
     auto& gamemodeInfo = gamemodeInfoMap.at(gamemode);
 
-    m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode, m_dual);
+    m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode, m_dual, m_mainOnly);
     m_currentMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
     m_currentTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
 

@@ -91,7 +91,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
     m_currentMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
     m_currentTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
 
-    m_ufoDome->setVisible(gamemode == FunnySpriteGamemode::Ufo);
+    m_ufoDome->setVisible(gamemode == FunnySpriteGamemode::Ufo && !m_mainOnly);
 
     // to allow us to use setScale and stuff to copy the original icon's
     // transforms, we'll use an additional transform

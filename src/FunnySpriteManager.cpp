@@ -360,7 +360,7 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     // something the same size as the screen so we need to resize
     // TODO: look into mat rendertexture?
 
-    // TODO: note: icon gradients queues in main thread
+    // TODO: note: icon gradients and fine outline queues in main thread
     // https://github.com/Zilko/icon-gradients/blob/main/src/Hooks/SimplePlayer.cpp#L19
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
@@ -372,6 +372,13 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     } else {
         playerSprite->setScaleX(winSize.width / (playerSprite->getContentWidth() + .5f));
         playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + .5f));
+    }
+
+    // if this is a ufo, add more space for dome
+    if (m_icon[gamemode].m_iconType == IconType::Ufo && !mainOnly) {
+        // add more space for ufo dome
+        playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 20.f));
+        playerSprite->setPositionY(playerSprite->getPositionY() - 50.f);
     }
 
     if (mainOnly) {

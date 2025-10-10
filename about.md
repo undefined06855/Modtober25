@@ -12,6 +12,6 @@ certainly interesting results depending on what you choose!
 
 
 Mod support:
-- More Icons: Full support!
+- More Icons: Complete (slightly buggy) support!
 - Separate Dual Icons: Partial
 - Icon Gradients and Fine Outline: None

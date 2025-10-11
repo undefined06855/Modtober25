@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.3
+- Improved compatibility with Globed so only your icon gets changed
+
 ## v1.0.2
 - Removed iOS support because rendertextures are broken
 

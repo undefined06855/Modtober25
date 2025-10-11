@@ -1,12 +1,15 @@
 #include "PlayerObject.hpp"
 #include "../FunnySpriteManager.hpp"
+#include "GJBaseGameLayer.hpp"
 #include <Geode/utils/coro.hpp>
 
 void FakeSpriteBatchNode::draw() { CCNode::draw(); }
 void FakeSpriteBatchNode::visit() { CCNode::visit(); }
 
 bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, cocos2d::CCLayer* layer, bool playLayer) {
-    if (!gameLayer) {
+    m_gameLayer = gameLayer; // required by shouldDoChanges
+
+    if (!shouldDoChanges()) {
         // this is an icon on menulayer
         return PlayerObject::init(player, ship, gameLayer, layer, playLayer);
     }
@@ -114,7 +117,7 @@ void HookedPlayerObject::exitGamemode(Gamemode gamemode) {
 }
 
 void HookedPlayerObject::updateFunnySprite() {
-    if (!m_gameLayer) return;
+    if (!shouldDoChanges()) return;
 
     auto fields = m_fields.self();
 
@@ -160,7 +163,7 @@ void HookedPlayerObject::updateFunnySprite() {
 void HookedPlayerObject::createRobot(int frame) {
     // set up funnysprite in gjrobotsprite
     PlayerObject::createRobot(frame);
-    if (!m_gameLayer) return;
+    if (!shouldDoChanges()) return;
 
     if (m_robotSprite->m_paSprite->getChildByType<FunnySprite>(0)) return;
 
@@ -181,7 +184,7 @@ void HookedPlayerObject::createRobot(int frame) {
 void HookedPlayerObject::createSpider(int frame) {
     // set up funnysprite in gjspidersprite
     PlayerObject::createSpider(frame);
-    if (!m_gameLayer) return;
+    if (!shouldDoChanges()) return;
 
     if (m_spiderSprite->m_paSprite->getChildByType<FunnySprite>(0)) return;
 
@@ -199,7 +202,7 @@ void HookedPlayerObject::createSpider(int frame) {
 
 void HookedPlayerObject::update(float dt) {
     PlayerObject::update(dt);
-    if (!m_gameLayer) return;
+    if (!shouldDoChanges()) return;
 
     auto fields = m_fields.self();
 
@@ -241,12 +244,12 @@ void HookedPlayerObject::updateShitVisibility() {
         fields->m_funnyVehicleSprite->setRotation(m_vehicleSprite->getRotation());
     }
 
-    fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
-    fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
+    if (fields->m_funnyRobotSprite) fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
+    if (fields->m_funnySpiderSprite) fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
 }
 
 void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {
-    if (!m_gameLayer) return;
+    if (!shouldDoChanges()) return;
 
     // icon gradients already includes this (this is taken from it)
     if (geode::Loader::get()->isModLoaded("zilko.icon_gradients")) return;
@@ -261,4 +264,11 @@ void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {
     }();
 
     *(void**)batchNode = vtable;
+}
+
+bool HookedPlayerObject::shouldDoChanges() {
+    // changed so globed players dont get modified
+    if (!m_gameLayer) return false;
+    
+    return static_cast<HookedGJBaseGameLayer*>(m_gameLayer)->m_fields->m_creatingPlayers || m_gameLayer->m_player1 == this || m_gameLayer->m_player2 == this;
 }

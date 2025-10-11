@@ -46,6 +46,6 @@ class $modify(HookedPlayerObject, PlayerObject) {
     void update(float dt);
 
     void updateShitVisibility();
-
     void patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode);
+    bool shouldDoChanges();
 };

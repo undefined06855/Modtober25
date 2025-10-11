@@ -56,7 +56,7 @@ bool HookedCharacterColorPage::init() {
     }
 
     if (auto ship = m_buttonMenu->getChildByID("ship-button")) {
-        ship->getChildrenExt()[0]->setVisible(false);
+        ship->getChildByIndex(0)->setVisible(false);
 
         auto wrap = cocos2d::CCNode::create();
         wrap->setID("icon-wrap"_spr);

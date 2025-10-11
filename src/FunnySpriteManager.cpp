@@ -296,9 +296,11 @@ void FunnySpriteManager::updateRenderedTrailSprites(Texture2DGroup& group) {
 
 SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dual) {
     auto simplePlayer = SimplePlayer::create(0);
-    auto playerSprite = simplePlayer->getChildrenExt()[0];
+    auto playerSprite = simplePlayer->getChildByIndex(0);
 
     auto gameManager = GameManager::get();
+
+    auto simplePlayerType = m_icon[gamemode].m_iconType;
 
     // this was so nice and beautiful before MOD COMPATIBILITY :(
 
@@ -317,10 +319,10 @@ SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dua
             { IconType::Jetpack, "jetpack" }
         };
 
-        auto settingName = iconTypeToName.at(m_icon[gamemode].m_iconType);
-        simplePlayer->updatePlayerFrame(mod->getSavedValue<int64_t>(settingName), m_icon[gamemode].m_iconType);
+        auto settingName = iconTypeToName.at(simplePlayerType);
+        simplePlayer->updatePlayerFrame(mod->getSavedValue<int64_t>(settingName, m_icon[gamemode].m_index), simplePlayerType);
     } else {
-        simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, m_icon[gamemode].m_iconType);
+        simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, simplePlayerType);
     }
 
     if (MoreIcons::loaded()) {
@@ -347,12 +349,23 @@ SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dua
     simplePlayer->setGlowOutline(gameManager->colorForIdx(gameManager->getPlayerGlowColor()));
     if (!gameManager->getPlayerGlow()) simplePlayer->disableGlowOutline();
 
+    if (simplePlayerType == IconType::Robot || simplePlayerType == IconType::Spider) {
+        // remove all unwanted children
+        for (int i = 0; i < simplePlayer->getChildrenCount(); i++) {
+            auto child = simplePlayer->getChildByIndex(i);
+            if (!geode::cast::typeinfo_cast<GJRobotSprite*>(child)) {
+                child->removeFromParent();
+                i--;
+            }
+        }
+    }
+
     return simplePlayer;
 }
 
 void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly) {
     auto simplePlayer = createSimplePlayer(gamemode, dual);
-    auto playerSprite = simplePlayer->getChildrenExt()[0];
+    auto playerSprite = simplePlayer->getChildByIndex(0);
 
     auto gameManager = GameManager::get();
 
@@ -376,9 +389,16 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 
     // if this is a ufo, add more space for dome
     if (m_icon[gamemode].m_iconType == IconType::Ufo && !mainOnly) {
-        // add more space for ufo dome
         playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 20.f));
-        playerSprite->setPositionY(playerSprite->getPositionY() - 50.f);
+        playerSprite->setPositionY(playerSprite->getPositionY() - 60.f);
+    }
+
+    // if this is a robot or spider, add more space just because
+    if ((m_icon[gamemode].m_iconType == IconType::Robot || m_icon[gamemode].m_iconType == IconType::Spider) && !mainOnly) {
+        playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 10.f));
+        playerSprite->setPositionY(playerSprite->getPositionY() - 40.f);
+
+        playerSprite->setScaleX(winSize.width / (playerSprite->getContentWidth() + 10.f));
     }
 
     if (mainOnly) {
@@ -386,7 +406,7 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     }
 
     renderTexture.capture(playerSprite);
-    simplePlayer->release();
+    // simplePlayer->release();
 }
 
 void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode) {

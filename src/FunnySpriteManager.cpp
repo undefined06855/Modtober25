@@ -388,13 +388,18 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     }
 
     // if this is a ufo, add more space for dome
-    if (m_icon[gamemode].m_iconType == IconType::Ufo && !mainOnly) {
+    if (m_icon[gamemode].m_iconType == IconType::Ufo) {
         playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 20.f));
-        playerSprite->setPositionY(playerSprite->getPositionY() - 60.f);
+        playerSprite->setPositionY(playerSprite->getPositionY() - 90.f);
+    }
+
+    // if this is ship or wave, reduce scale Y a bit
+    if (m_icon[gamemode].m_iconType == IconType::Ship || m_icon[gamemode].m_iconType == IconType::Wave) {
+        playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 10.f));
     }
 
     // if this is a robot or spider, add more space just because
-    if ((m_icon[gamemode].m_iconType == IconType::Robot || m_icon[gamemode].m_iconType == IconType::Spider) && !mainOnly) {
+    if (m_icon[gamemode].m_iconType == IconType::Robot || m_icon[gamemode].m_iconType == IconType::Spider) {
         playerSprite->setScaleY(winSize.height / (playerSprite->getContentHeight() + 10.f));
         playerSprite->setPositionY(playerSprite->getPositionY() - 40.f);
 

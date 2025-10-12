@@ -43,7 +43,7 @@ bool HookedMenuLayer::init() {
         auto pop = FLAlertLayer::create(
             "\"\"Icon\"\" Kit",
             "The <cj>mapping shader</c> <cr>failed</c> to compile!\nThe mod "
-            "will not <cl>work!</c>",
+            "will <cr>not work!</c>",
             "ok"
         );
         pop->m_scene = this;

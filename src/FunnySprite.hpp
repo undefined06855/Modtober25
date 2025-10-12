@@ -28,10 +28,13 @@ public:
     std::vector<cocos2d::CCNode*> m_limbs;
     cocos2d::CCSprite* m_ufoDome;
 
+    float m_time;
+
     void updateTextures();
     void updateForGamemode(FunnySpriteGamemode gamemode);
 
     void addLimbs(FunnySpriteGamemode gamemode);
 
+    void update(float dt);
     void draw();
 };

@@ -227,7 +227,7 @@ cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
     bool ret = mappingShader->initWithVertexShaderByteArray(g_mappingShaderVertex, g_mappingShaderFragment);
     if (!ret) {
         geode::log::error("Shader failed to load!");
-        geode::log::error("{}", mappingShader->fragmentShaderLog()); // probably going to crash anyway
+        // geode::log::error("{}", mappingShader->fragmentShaderLog()); // probably going to crash anyway
 
         m_shaderFailed = true;
         return nullptr;
@@ -240,9 +240,11 @@ cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
     mappingShader->link();
     mappingShader->updateUniforms();
 
-    // set CC_Texture1 and CC_Texture2
+    // set CC_Texture1, CC_Texture2, CC_Texture3 and CC_Texture4
     mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture1"), 1);
     mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture2"), 2);
+    mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture3"), 3);
+    mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture4"), 4);
 
     cocos2d::CCShaderCache::sharedShaderCache()->addProgram(mappingShader, "mapping_shader"_spr);
 

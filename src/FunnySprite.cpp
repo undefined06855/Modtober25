@@ -26,6 +26,8 @@ bool FunnySprite::init() {
 
     m_currentGamemode = FunnySpriteGamemode::None;
 
+    m_time = 0.f;
+
     m_ufoDome = cocos2d::CCSprite::createWithSpriteFrameName("bird_01_3_001.png");
     m_ufoDome->setID("dome");
     m_ufoDome->setPosition({ 16.f, 9.f });
@@ -35,6 +37,8 @@ bool FunnySprite::init() {
     addChild(m_ufoDome);
 
     setShaderProgram(FunnySpriteManager::get().getMappingShader());
+
+    scheduleUpdate();
 
     return true;
 }
@@ -157,8 +161,15 @@ unsigned int* getNumberOfDraws() {
 #endif
 }
 
+void FunnySprite::update(float dt) {
+    m_time += dt;
+}
+
 void FunnySprite::draw() {
+    if (!m_pShaderProgram) return;
     CC_NODE_DRAW_SETUP();
+
+    m_pShaderProgram->setUniformLocationWith1f(m_pShaderProgram->getUniformLocationForName("u_weight"), (std::sin(m_time) + 1.f) / 2.f);
 
     cocos2d::ccGLBlendFunc(m_sBlendFunc.src, m_sBlendFunc.dst);
 
@@ -169,6 +180,8 @@ void FunnySprite::draw() {
     cocos2d::ccGLBindTexture2DN(0, m_currentTexture);
     cocos2d::ccGLBindTexture2DN(1, m_currentMappingTexture);
     cocos2d::ccGLBindTexture2DN(2, m_currentTransparencyTexture);
+    cocos2d::ccGLBindTexture2DN(3, FunnySpriteManager::get().mappingTextureForGamemode(FunnySpriteGamemode::Cube));
+    cocos2d::ccGLBindTexture2DN(4, FunnySpriteManager::get().transparencyMaskForGamemode(FunnySpriteGamemode::Cube));
 
     cocos2d::ccGLEnableVertexAttribs(cocos2d::kCCVertexAttribFlag_PosColorTex);
 

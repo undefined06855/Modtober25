@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.4
+- Hide the player when you die
+
 ## v1.0.3
 - Improved compatibility with Globed so only your icon gets changed
 

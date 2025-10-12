@@ -21,8 +21,12 @@ class $modify(HookedPlayerObject, PlayerObject) {
         FunnySprite* m_funnyVehicleSprite;
         FunnySprite* m_funnyRobotSprite;
         FunnySprite* m_funnySpiderSprite;
+
         bool m_isDualUpdated;
         Gamemode m_currentGamemode; // hope this doesnt desync!
+
+        bool m_showFunnySprite;
+        bool m_showFunnyVehicleSprite;
     };
 
     bool init(int player, int ship, GJBaseGameLayer* gameLayer, cocos2d::CCLayer* layer, bool playLayer);

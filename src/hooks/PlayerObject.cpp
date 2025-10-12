@@ -41,12 +41,14 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     funnyVehicleSprite->setID("funny-vehicle-sprite"_spr);
     funnyVehicleSprite->updateForGamemode(FunnySpriteGamemode::Ship);
     funnyVehicleSprite->setZOrder(2);
-    funnyVehicleSprite->setVisible(false);
     m_mainLayer->addChild(funnyVehicleSprite);
     fields->m_funnyVehicleSprite = funnyVehicleSprite;
 
     fields->m_currentGamemode = Gamemode::None;
     fields->m_isDualUpdated = false;
+
+    fields->m_showFunnySprite = true;
+    fields->m_showFunnyVehicleSprite = false;
 
     updateShitVisibility();
 
@@ -133,8 +135,8 @@ void HookedPlayerObject::updateFunnySprite() {
         case Gamemode::Swing: {
             // set type to whatever, hide vehicle
             fields->m_funnySprite->updateForGamemode(funnySpriteGamemode);
-            fields->m_funnySprite->setVisible(true);
-            fields->m_funnyVehicleSprite->setVisible(false);
+            fields->m_showFunnySprite = true;
+            fields->m_showFunnyVehicleSprite = false;
         } break;
 
         case Gamemode::Ship:
@@ -142,15 +144,15 @@ void HookedPlayerObject::updateFunnySprite() {
             // set sprite to cube (passenger), show vehicle
             fields->m_funnySprite->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
             fields->m_funnyVehicleSprite->updateForGamemode(funnySpriteGamemode);
-            fields->m_funnySprite->setVisible(true);
-            fields->m_funnyVehicleSprite->setVisible(true);
+            fields->m_showFunnySprite = true;
+            fields->m_showFunnyVehicleSprite = true;
         } break;
 
         case Gamemode::Robot:
         case Gamemode::Spider: {
             // let the funnysprites in gjspidersprite and gjrobotsprite handle this
-            fields->m_funnySprite->setVisible(false);
-            fields->m_funnyVehicleSprite->setVisible(false);
+            fields->m_showFunnySprite = false;
+            fields->m_showFunnyVehicleSprite = false;
         } break;
 
         default: break;
@@ -158,6 +160,8 @@ void HookedPlayerObject::updateFunnySprite() {
 
     m_iconSprite->setTexture(FunnySpriteManager::get().trailTextureForGamemode(funnySpriteGamemode));
     m_iconSprite->setTextureRect({ 0.f, 0.f, 32.f, 32.f });
+
+    updateShitVisibility();
 }
 
 void HookedPlayerObject::createRobot(int frame) {
@@ -246,6 +250,9 @@ void HookedPlayerObject::updateShitVisibility() {
 
     if (fields->m_funnyRobotSprite) fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
     if (fields->m_funnySpiderSprite) fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
+
+    fields->m_funnySprite->setVisible(!m_gameLayer->m_playerDied && fields->m_showFunnySprite);
+    fields->m_funnyVehicleSprite->setVisible(!m_gameLayer->m_playerDied && fields->m_showFunnyVehicleSprite);
 }
 
 void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {
@@ -269,6 +276,6 @@ void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {
 bool HookedPlayerObject::shouldDoChanges() {
     // changed so globed players dont get modified
     if (!m_gameLayer) return false;
-    
+
     return static_cast<HookedGJBaseGameLayer*>(m_gameLayer)->m_fields->m_creatingPlayers || m_gameLayer->m_player1 == this || m_gameLayer->m_player2 == this;
 }

@@ -77,7 +77,7 @@ void HookedGJGarageLayer::setupPage(int page, IconType type) {
 
     geode::log::debug("setting up page {} for icon type {}", page, fmt::underlying(type));
 
-    m_currentIcon = nullptr; // fixes a crash 
+    m_currentIcon = nullptr; // fixes a crash
     GJGarageLayer::setupPage(page, type);
 
     if (type > IconType::Jetpack) return;

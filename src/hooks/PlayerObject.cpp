@@ -118,6 +118,11 @@ void HookedPlayerObject::exitGamemode(Gamemode gamemode) {
     }
 }
 
+void HookedPlayerObject::playDeathEffect() {
+    PlayerObject::playDeathEffect();
+    updateShitVisibility();
+}
+
 void HookedPlayerObject::updateFunnySprite() {
     if (!shouldDoChanges()) return;
 
@@ -251,8 +256,8 @@ void HookedPlayerObject::updateShitVisibility() {
     if (fields->m_funnyRobotSprite) fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
     if (fields->m_funnySpiderSprite) fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
 
-    fields->m_funnySprite->setVisible(!m_gameLayer->m_playerDied && fields->m_showFunnySprite);
-    fields->m_funnyVehicleSprite->setVisible(!m_gameLayer->m_playerDied && fields->m_showFunnyVehicleSprite);
+    fields->m_funnySprite->setVisible(!m_isDead && fields->m_showFunnySprite);
+    fields->m_funnyVehicleSprite->setVisible(!m_isDead && fields->m_showFunnyVehicleSprite);
 }
 
 void HookedPlayerObject::patchBatchNode(cocos2d::CCSpriteBatchNode* batchNode) {

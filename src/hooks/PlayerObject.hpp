@@ -47,6 +47,8 @@ class $modify(HookedPlayerObject, PlayerObject) {
     void createRobot(int frame);
     void createSpider(int frame);
 
+    void playDeathEffect();
+
     void update(float dt);
 
     void updateShitVisibility();

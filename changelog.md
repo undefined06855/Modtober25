@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.6
+- Fixed small issues with textures on different graphics settings
+
 ## v1.0.5
 - Fixed death effects on other players crashing the game
 - Chroma Icons detection and disablation

@@ -73,6 +73,8 @@ public:
     void updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly);
     void updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode);
 
+    void recreateTextures();
+
     cocos2d::CCGLProgram* getMappingShader();
 
     GLuint textureForGamemode(FunnySpriteGamemode gamemode, bool dual, bool mainOnly);

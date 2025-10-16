@@ -10,3 +10,9 @@ int HookedGameManager::countForType(IconType type) {
 
     return fsm.m_totalCountForTypes;
 }
+
+void HookedGameManager::reloadAllStep5() {
+    GameManager::reloadAllStep5();
+
+    FunnySpriteManager::get().recreateTextures();
+}

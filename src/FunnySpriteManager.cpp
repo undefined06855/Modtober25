@@ -219,6 +219,28 @@ void FunnySpriteManager::init() {
     }
 }
 
+// if there's a better way to do this let me know please!!!
+void FunnySpriteManager::recreateTextures() {
+    m_dualIcons.~RenderTextureGroup();
+    new (&m_dualIcons) RenderTextureGroup();
+
+    m_mainIcons.~RenderTextureGroup();
+    new (&m_mainIcons) RenderTextureGroup();
+
+    m_mainIconsMainOnly.~RenderTextureGroup();
+    new (&m_mainIconsMainOnly) RenderTextureGroup();
+
+    m_ghostTrailIcons.~Texture2DGroup();
+    new (&m_ghostTrailIcons) Texture2DGroup();
+
+    auto cache = cocos2d::CCTextureCache::get();
+    for (int i = 1; i <= 18; i++) {
+        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false);
+    }
+
+    updateRenderedSprites();
+}
+
 cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
     auto mappingShader = cocos2d::CCShaderCache::sharedShaderCache()->programForKey("mapping_shader"_spr);
     if (mappingShader) return mappingShader;
@@ -240,7 +262,6 @@ cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
     mappingShader->link();
     mappingShader->updateUniforms();
 
-    // set CC_Texture1 and CC_Texture2
     mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture1"), 1);
     mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture2"), 2);
 

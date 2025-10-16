@@ -5,7 +5,7 @@
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
-#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_BORDER
+#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE
 
 RenderTextureGroup::RenderTextureGroup()
     : m_cube(RENDERTEXTURE_INIT_PARAMS)
@@ -438,7 +438,7 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode) {
     // this gets weirdly cut off and im  not sure why
     auto size = 32.f * cocos2d::CCDirector::get()->getContentScaleFactor();
-    auto renderTexture = RenderTexture(size, size, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_BORDER);
+    auto renderTexture = RenderTexture(size, size, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE);
 
     auto funnySprite = FunnySprite::create();
     funnySprite->m_mainOnly = true; // only place where this member is used

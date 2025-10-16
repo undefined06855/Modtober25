@@ -5,7 +5,7 @@
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
-#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE
+#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_BORDER
 
 RenderTextureGroup::RenderTextureGroup()
     : m_cube(RENDERTEXTURE_INIT_PARAMS)
@@ -141,11 +141,7 @@ cocos2d::CCTexture2D* FunnySpriteManager::trailTextureForGamemode(FunnySpriteGam
 
 void FunnySpriteManager::init() {
     // add textures to cache
-    auto cache = cocos2d::CCTextureCache::get();
-
-    for (int i = 1; i <= 18; i++) {
-        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false);
-    }
+    addMappingTexturesToCache();
 
     // create shader
     getMappingShader();
@@ -219,6 +215,13 @@ void FunnySpriteManager::init() {
     }
 }
 
+void FunnySpriteManager::addMappingTexturesToCache() {
+    auto cache = cocos2d::CCTextureCache::get();
+    for (int i = 1; i <= 18; i++) {
+        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false);
+    }
+}
+
 // if there's a better way to do this let me know please!!!
 void FunnySpriteManager::recreateTextures() {
     m_dualIcons.~RenderTextureGroup();
@@ -233,10 +236,7 @@ void FunnySpriteManager::recreateTextures() {
     m_ghostTrailIcons.~Texture2DGroup();
     new (&m_ghostTrailIcons) Texture2DGroup();
 
-    auto cache = cocos2d::CCTextureCache::get();
-    for (int i = 1; i <= 18; i++) {
-        cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false);
-    }
+    addMappingTexturesToCache();
 
     updateRenderedSprites();
 }
@@ -436,7 +436,9 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 }
 
 void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode) {
-    auto renderTexture = RenderTexture(128, 128, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE);
+    // this gets weirdly cut off and im  not sure why
+    auto size = 32.f * cocos2d::CCDirector::get()->getContentScaleFactor();
+    auto renderTexture = RenderTexture(size, size, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_BORDER);
 
     auto funnySprite = FunnySprite::create();
     funnySprite->m_mainOnly = true; // only place where this member is used

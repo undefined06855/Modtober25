@@ -65,6 +65,22 @@ bool HookedMenuLayer::init() {
         geode::Mod::get()->setSavedValue("warned-dual-icons", true);
     }
 
+    bool seenChromaIconsWarning = geode::Mod::get()->getSavedValue<bool>("warned-chroma-icons", false);
+    auto chromaIcons = geode::Loader::get()->getLoadedMod("naxrin.chroma_icons");
+    if (!seenChromaIconsWarning && chromaIcons && chromaIcons->getSavedValue<bool>("activate")) {
+        auto pop = FLAlertLayer::create(
+            "\"\"Icon\"\" Kit",
+            "<cj>Chroma Icons</c> is enabled!\nThis mod may <cr>crash</c> with "
+            "it installed! The mod has been <cy>automatically disabled</c>.",
+            "ok"
+        );
+        pop->m_scene = this;
+        pop->show();
+        geode::Mod::get()->setSavedValue("warned-chroma-icons", true);
+
+        chromaIcons->setSavedValue("activate", false);
+    }
+
     return true;
 }
 

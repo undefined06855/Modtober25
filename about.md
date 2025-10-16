@@ -16,3 +16,4 @@ Mod support:
 - More Icons: Complete (slightly buggy) support!
 - Separate Dual Icons: Partial
 - Icon Gradients and Fine Outline: None
+- Chroma Icons: None

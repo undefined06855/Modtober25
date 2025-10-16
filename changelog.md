@@ -1,6 +1,10 @@
 # ""Icon"" Kit
+## v1.0.5
+- Fixed death effects on other players crashing the game
+- Chroma Icons detection and disablation
+
 ## v1.0.4
-- Hide the player when you die
+- Fixed the player being visible when you die
 
 ## v1.0.3
 - Improved compatibility with Globed so only your icon gets changed

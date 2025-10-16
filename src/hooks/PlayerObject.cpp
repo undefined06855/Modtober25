@@ -120,6 +120,9 @@ void HookedPlayerObject::exitGamemode(Gamemode gamemode) {
 
 void HookedPlayerObject::playDeathEffect() {
     PlayerObject::playDeathEffect();
+
+    if (!shouldDoChanges()) return;
+
     updateShitVisibility();
 }
 
@@ -238,7 +241,7 @@ void HookedPlayerObject::updateShitVisibility() {
     if (m_iconSprite) m_iconSprite->setVisible(false);
     if (m_vehicleSprite) m_vehicleSprite->setVisible(false);
 
-    if (m_iconSprite) {
+    if (m_iconSprite && fields->m_funnySprite) {
         // cube platformer animations
         if (fields->m_currentGamemode == Gamemode::Cube) {
             fields->m_funnySprite->setScaleX(m_iconSprite->getScaleX());

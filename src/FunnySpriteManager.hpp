@@ -51,9 +51,9 @@ public:
     // then it gets passed to the FunnySprite* and it adds the sprite, then when
     // it renders it renders with the shader to make it appear like the sprite
 
-    Texture2DGroup m_mainIcons;
-    Texture2DGroup m_dualIcons;
-    Texture2DGroup m_mainIconsMainOnly; // for ghost trail
+    RenderTextureGroup m_mainIcons;
+    RenderTextureGroup m_dualIcons;
+    RenderTextureGroup m_mainIconsMainOnly; // for ghost trail
     Texture2DGroup m_ghostTrailIcons;
 
     std::unordered_map<IconType, IconChoiceInfo> m_icon;
@@ -67,10 +67,10 @@ public:
 
     void init();
     void updateRenderedSprites();
-    void updateRenderedSprites(Texture2DGroup& group, bool dual, bool mainOnly);
+    void updateRenderedSprites(RenderTextureGroup& group, bool dual, bool mainOnly);
     void updateRenderedTrailSprites(Texture2DGroup& group);
     SimplePlayer* createSimplePlayer(IconType gamemode, bool dual);
-    void updateRenderedSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode, bool dual, bool mainOnly);
+    void updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly);
     void updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode);
 
     void addMappingTexturesToCache();

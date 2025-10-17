@@ -14,16 +14,17 @@ struct UnloadedSingleIconInfo {
 
 struct RenderTextureGroup {
     RenderTextureGroup();
+    ~RenderTextureGroup();
 
-    RenderTexture m_cube;
-    RenderTexture m_ship;
-    RenderTexture m_ball;
-    RenderTexture m_ufo;
-    RenderTexture m_wave;
-    RenderTexture m_robot;
-    RenderTexture m_spider;
-    RenderTexture m_swing;
-    RenderTexture m_jetpack;
+    cocos2d::CCTexture2D* m_cube;
+    cocos2d::CCTexture2D* m_ship;
+    cocos2d::CCTexture2D* m_ball;
+    cocos2d::CCTexture2D* m_ufo;
+    cocos2d::CCTexture2D* m_wave;
+    cocos2d::CCTexture2D* m_robot;
+    cocos2d::CCTexture2D* m_spider;
+    cocos2d::CCTexture2D* m_swing;
+    cocos2d::CCTexture2D* m_jetpack;
 };
 
 struct Texture2DGroup {
@@ -70,7 +71,7 @@ public:
     void updateRenderedSprites(RenderTextureGroup& group, bool dual, bool mainOnly);
     void updateRenderedTrailSprites(Texture2DGroup& group);
     SimplePlayer* createSimplePlayer(IconType gamemode, bool dual);
-    void updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly);
+    void updateRenderedSprite(cocos2d::CCTexture2D* texture, IconType gamemode, bool dual, bool mainOnly);
     void updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode);
 
     void addMappingTexturesToCache();

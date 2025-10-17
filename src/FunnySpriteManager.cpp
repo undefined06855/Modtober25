@@ -55,15 +55,15 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
         // for ghost trail textures
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
-            case FunnySpriteGamemode::Cube: return m_mainIconsMainOnly.m_cube.getTexture();
-            case FunnySpriteGamemode::Ship: return m_mainIconsMainOnly.m_ship.getTexture();
-            case FunnySpriteGamemode::Ball: return m_mainIconsMainOnly.m_ball.getTexture();
-            case FunnySpriteGamemode::Ufo: return m_mainIconsMainOnly.m_ufo.getTexture();
-            case FunnySpriteGamemode::Wave: return m_mainIconsMainOnly.m_wave.getTexture();
-            case FunnySpriteGamemode::Robot: return m_mainIconsMainOnly.m_robot.getTexture();
-            case FunnySpriteGamemode::Spider: return m_mainIconsMainOnly.m_spider.getTexture();
-            case FunnySpriteGamemode::Swing: return m_mainIconsMainOnly.m_swing.getTexture();
-            case FunnySpriteGamemode::Jetpack: return m_mainIconsMainOnly.m_jetpack.getTexture();
+            case FunnySpriteGamemode::Cube: return m_mainIconsMainOnly.m_cube->m_uName;
+            case FunnySpriteGamemode::Ship: return m_mainIconsMainOnly.m_ship->m_uName;
+            case FunnySpriteGamemode::Ball: return m_mainIconsMainOnly.m_ball->m_uName;
+            case FunnySpriteGamemode::Ufo: return m_mainIconsMainOnly.m_ufo->m_uName;
+            case FunnySpriteGamemode::Wave: return m_mainIconsMainOnly.m_wave->m_uName;
+            case FunnySpriteGamemode::Robot: return m_mainIconsMainOnly.m_robot->m_uName;
+            case FunnySpriteGamemode::Spider: return m_mainIconsMainOnly.m_spider->m_uName;
+            case FunnySpriteGamemode::Swing: return m_mainIconsMainOnly.m_swing->m_uName;
+            case FunnySpriteGamemode::Jetpack: return m_mainIconsMainOnly.m_jetpack->m_uName;
             default: return 0;
         }
     }
@@ -71,29 +71,29 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
     if (!dual) {
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
-            case FunnySpriteGamemode::Cube: return m_mainIcons.m_cube.getTexture();
-            case FunnySpriteGamemode::Ship: return m_mainIcons.m_ship.getTexture();
-            case FunnySpriteGamemode::Ball: return m_mainIcons.m_ball.getTexture();
-            case FunnySpriteGamemode::Ufo: return m_mainIcons.m_ufo.getTexture();
-            case FunnySpriteGamemode::Wave: return m_mainIcons.m_wave.getTexture();
-            case FunnySpriteGamemode::Robot: return m_mainIcons.m_robot.getTexture();
-            case FunnySpriteGamemode::Spider: return m_mainIcons.m_spider.getTexture();
-            case FunnySpriteGamemode::Swing: return m_mainIcons.m_swing.getTexture();
-            case FunnySpriteGamemode::Jetpack: return m_mainIcons.m_jetpack.getTexture();
+            case FunnySpriteGamemode::Cube: return m_mainIcons.m_cube->m_uName;
+            case FunnySpriteGamemode::Ship: return m_mainIcons.m_ship->m_uName;
+            case FunnySpriteGamemode::Ball: return m_mainIcons.m_ball->m_uName;
+            case FunnySpriteGamemode::Ufo: return m_mainIcons.m_ufo->m_uName;
+            case FunnySpriteGamemode::Wave: return m_mainIcons.m_wave->m_uName;
+            case FunnySpriteGamemode::Robot: return m_mainIcons.m_robot->m_uName;
+            case FunnySpriteGamemode::Spider: return m_mainIcons.m_spider->m_uName;
+            case FunnySpriteGamemode::Swing: return m_mainIcons.m_swing->m_uName;
+            case FunnySpriteGamemode::Jetpack: return m_mainIcons.m_jetpack->m_uName;
             default: return 0;
         }
     } else {
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
-            case FunnySpriteGamemode::Cube: return m_dualIcons.m_cube.getTexture();
-            case FunnySpriteGamemode::Ship: return m_dualIcons.m_ship.getTexture();
-            case FunnySpriteGamemode::Ball: return m_dualIcons.m_ball.getTexture();
-            case FunnySpriteGamemode::Ufo: return m_dualIcons.m_ufo.getTexture();
-            case FunnySpriteGamemode::Wave: return m_dualIcons.m_wave.getTexture();
-            case FunnySpriteGamemode::Robot: return m_dualIcons.m_robot.getTexture();
-            case FunnySpriteGamemode::Spider: return m_dualIcons.m_spider.getTexture();
-            case FunnySpriteGamemode::Swing: return m_dualIcons.m_swing.getTexture();
-            case FunnySpriteGamemode::Jetpack: return m_dualIcons.m_jetpack.getTexture();
+            case FunnySpriteGamemode::Cube: return m_dualIcons.m_cube->m_uName;
+            case FunnySpriteGamemode::Ship: return m_dualIcons.m_ship->m_uName;
+            case FunnySpriteGamemode::Ball: return m_dualIcons.m_ball->m_uName;
+            case FunnySpriteGamemode::Ufo: return m_dualIcons.m_ufo->m_uName;
+            case FunnySpriteGamemode::Wave: return m_dualIcons.m_wave->m_uName;
+            case FunnySpriteGamemode::Robot: return m_dualIcons.m_robot->m_uName;
+            case FunnySpriteGamemode::Spider: return m_dualIcons.m_spider->m_uName;
+            case FunnySpriteGamemode::Swing: return m_dualIcons.m_swing->m_uName;
+            case FunnySpriteGamemode::Jetpack: return m_dualIcons.m_jetpack->m_uName;
             default: return 0;
         }
     }
@@ -224,14 +224,14 @@ void FunnySpriteManager::addMappingTexturesToCache() {
 
 // if there's a better way to do this let me know please!!!
 void FunnySpriteManager::recreateTextures() {
-    m_dualIcons.~RenderTextureGroup();
-    new (&m_dualIcons) RenderTextureGroup();
+    m_dualIcons.~Texture2DGroup();
+    new (&m_dualIcons) Texture2DGroup();
 
-    m_mainIcons.~RenderTextureGroup();
-    new (&m_mainIcons) RenderTextureGroup();
+    m_mainIcons.~Texture2DGroup();
+    new (&m_mainIcons) Texture2DGroup();
 
-    m_mainIconsMainOnly.~RenderTextureGroup();
-    new (&m_mainIconsMainOnly) RenderTextureGroup();
+    m_mainIconsMainOnly.~Texture2DGroup();
+    new (&m_mainIconsMainOnly) Texture2DGroup();
 
     m_ghostTrailIcons.~Texture2DGroup();
     new (&m_ghostTrailIcons) Texture2DGroup();
@@ -291,7 +291,7 @@ void FunnySpriteManager::updateRenderedSprites() {
     updateRenderedTrailSprites(m_ghostTrailIcons);
 }
 
-void FunnySpriteManager::updateRenderedSprites(RenderTextureGroup& group, bool dual, bool mainOnly) {
+void FunnySpriteManager::updateRenderedSprites(Texture2DGroup& group, bool dual, bool mainOnly) {
     updateRenderedSprite(group.m_cube, IconType::Cube, dual, mainOnly);
     updateRenderedSprite(group.m_ship, IconType::Ship, dual, mainOnly);
     updateRenderedSprite(group.m_ball, IconType::Ball, dual, mainOnly);
@@ -384,7 +384,9 @@ SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dua
     return simplePlayer;
 }
 
-void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly) {
+void FunnySpriteManager::updateRenderedSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode, bool dual, bool mainOnly) {
+    auto renderTexture = RenderTexture(512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE);
+
     auto simplePlayer = createSimplePlayer(gamemode, dual);
     auto playerSprite = simplePlayer->getChildByIndex(0);
 
@@ -429,9 +431,16 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 
     if (mainOnly) {
         playerSprite->removeAllChildren();
+        if (simplePlayer->m_robotSprite) {
+            simplePlayer->m_robotSprite->m_paSprite = nullptr;
+        }
+        if (simplePlayer->m_spiderSprite) {
+            simplePlayer->m_spiderSprite->m_paSprite = nullptr;
+        }
     }
 
     renderTexture.capture(playerSprite);
+    texture = renderTexture.intoTexture();
     // simplePlayer->release();
 }
 

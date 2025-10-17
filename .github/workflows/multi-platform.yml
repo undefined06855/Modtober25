@@ -19,9 +19,9 @@ jobs:
           os: macos-latest
 
         # rendertexture is broken
-        # - name: iOS
-        #   os: macos-latest
-        #   target: iOS
+        - name: iOS
+          os: macos-latest
+          target: iOS
 
         - name: Android32
           os: ubuntu-latest

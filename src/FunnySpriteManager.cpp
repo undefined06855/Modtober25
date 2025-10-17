@@ -432,7 +432,7 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
     }
 
     renderTexture.capture(playerSprite);
-    simplePlayer->release();
+    // simplePlayer->release();
 }
 
 void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode) {

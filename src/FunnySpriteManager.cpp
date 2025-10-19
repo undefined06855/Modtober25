@@ -5,9 +5,9 @@
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
-#define RENDERTEXTURE_INIT_PARAMS nullptr, cocos2d::kCCTexture2DPixelFormat_RGBA8888, 512, 512, { 512, 512 }
+#define TEXTURE_INIT_PARAMS nullptr, cocos2d::kCCTexture2DPixelFormat_RGBA8888, size, size, { size, size }
 
-RenderTextureGroup::RenderTextureGroup()
+RenderTextureGroup::RenderTextureGroup(float size)
     : m_cube(new cocos2d::CCTexture2D())
     , m_ship(new cocos2d::CCTexture2D())
     , m_ball(new cocos2d::CCTexture2D())
@@ -17,18 +17,18 @@ RenderTextureGroup::RenderTextureGroup()
     , m_spider(new cocos2d::CCTexture2D())
     , m_swing(new cocos2d::CCTexture2D())
     , m_jetpack(new cocos2d::CCTexture2D()) {
-        m_cube->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_ship->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_ball->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_ufo->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_wave->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_robot->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_spider->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_swing->initWithData(RENDERTEXTURE_INIT_PARAMS);
-        m_jetpack->initWithData(RENDERTEXTURE_INIT_PARAMS);
-    }
+    m_cube->initWithData(TEXTURE_INIT_PARAMS);
+    m_ship->initWithData(TEXTURE_INIT_PARAMS);
+    m_ball->initWithData(TEXTURE_INIT_PARAMS);
+    m_ufo->initWithData(TEXTURE_INIT_PARAMS);
+    m_wave->initWithData(TEXTURE_INIT_PARAMS);
+    m_robot->initWithData(TEXTURE_INIT_PARAMS);
+    m_spider->initWithData(TEXTURE_INIT_PARAMS);
+    m_swing->initWithData(TEXTURE_INIT_PARAMS);
+    m_jetpack->initWithData(TEXTURE_INIT_PARAMS);
+}
 
-#undef RENDERTEXTURE_INIT_PARAMS
+#undef TEXTURE_INIT_PARAMS
 
 RenderTextureGroup::~RenderTextureGroup() {
     m_cube->release();
@@ -42,21 +42,11 @@ RenderTextureGroup::~RenderTextureGroup() {
     m_jetpack->release();
 }
 
-Texture2DGroup::Texture2DGroup()
-    : m_cube(nullptr)
-    , m_ship(nullptr)
-    , m_ball(nullptr)
-    , m_ufo(nullptr)
-    , m_wave(nullptr)
-    , m_robot(nullptr)
-    , m_spider(nullptr)
-    , m_swing(nullptr)
-    , m_jetpack(nullptr) {}
-
 FunnySpriteManager::FunnySpriteManager()
-    : m_mainIcons()
-    , m_dualIcons()
-    , m_mainIconsMainOnly()
+    : m_mainIcons(512.f)
+    , m_dualIcons(512.f)
+    , m_mainIconsMainOnly(512.f)
+    , m_ghostTrailIcons(32.f * cocos2d::CCDirector::get()->getContentScaleFactor())
 
     , m_icon({})
 
@@ -247,16 +237,16 @@ void FunnySpriteManager::addMappingTexturesToCache() {
 // if there's a better way to do this let me know please!!!
 void FunnySpriteManager::recreateTextures() {
     m_dualIcons.~RenderTextureGroup();
-    new (&m_dualIcons) RenderTextureGroup();
+    new (&m_dualIcons) RenderTextureGroup(512.f);
 
     m_mainIcons.~RenderTextureGroup();
-    new (&m_mainIcons) RenderTextureGroup();
+    new (&m_mainIcons) RenderTextureGroup(512.f);
 
     m_mainIconsMainOnly.~RenderTextureGroup();
-    new (&m_mainIconsMainOnly) RenderTextureGroup();
+    new (&m_mainIconsMainOnly) RenderTextureGroup(512.f);
 
-    m_ghostTrailIcons.~Texture2DGroup();
-    new (&m_ghostTrailIcons) Texture2DGroup();
+    m_ghostTrailIcons.~RenderTextureGroup();
+    new (&m_ghostTrailIcons) RenderTextureGroup(32.f * cocos2d::CCDirector::get()->getContentScaleFactor());
 
     addMappingTexturesToCache();
 
@@ -325,7 +315,7 @@ void FunnySpriteManager::updateRenderedSprites(RenderTextureGroup& group, bool d
     updateRenderedSprite(group.m_jetpack, IconType::Jetpack, dual, mainOnly);
 }
 
-void FunnySpriteManager::updateRenderedTrailSprites(Texture2DGroup& group) {
+void FunnySpriteManager::updateRenderedTrailSprites(RenderTextureGroup& group) {
     updateRenderedTrailSprite(group.m_cube, IconType::Cube);
     updateRenderedTrailSprite(group.m_ship, IconType::Ship);
     updateRenderedTrailSprite(group.m_ball, IconType::Ball);
@@ -465,10 +455,8 @@ void FunnySpriteManager::updateRenderedSprite(cocos2d::CCTexture2D* texture, Ico
     // simplePlayer->release();
 }
 
-void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode) {
-    // this gets weirdly cut off and im  not sure why
-    auto size = 32.f * cocos2d::CCDirector::get()->getContentScaleFactor();
-    auto renderTexture = RenderTexture(size, size, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE);
+void FunnySpriteManager::updateRenderedTrailSprite(cocos2d::CCTexture2D* texture, IconType gamemode) {
+    auto renderTexture = RenderTexture(texture);
 
     auto funnySprite = FunnySprite::create();
     funnySprite->m_mainOnly = true; // only place where this member is used
@@ -488,8 +476,6 @@ void FunnySpriteManager::updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture
     }
 
     renderTexture.capture(funnySprite);
-
-    texture = renderTexture.intoTexture();
 }
 
 int FunnySpriteManager::realCountForType(IconType type) {

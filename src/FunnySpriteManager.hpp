@@ -13,7 +13,7 @@ struct UnloadedSingleIconInfo {
 };
 
 struct RenderTextureGroup {
-    RenderTextureGroup();
+    RenderTextureGroup(float size);
     ~RenderTextureGroup();
 
     cocos2d::CCTexture2D* m_cube;
@@ -25,20 +25,6 @@ struct RenderTextureGroup {
     cocos2d::CCTexture2D* m_spider;
     cocos2d::CCTexture2D* m_swing;
     cocos2d::CCTexture2D* m_jetpack;
-};
-
-struct Texture2DGroup {
-    Texture2DGroup();
-
-    geode::Ref<cocos2d::CCTexture2D> m_cube;
-    geode::Ref<cocos2d::CCTexture2D> m_ship;
-    geode::Ref<cocos2d::CCTexture2D> m_ball;
-    geode::Ref<cocos2d::CCTexture2D> m_ufo;
-    geode::Ref<cocos2d::CCTexture2D> m_wave;
-    geode::Ref<cocos2d::CCTexture2D> m_robot;
-    geode::Ref<cocos2d::CCTexture2D> m_spider;
-    geode::Ref<cocos2d::CCTexture2D> m_swing;
-    geode::Ref<cocos2d::CCTexture2D> m_jetpack;
 };
 
 class FunnySpriteManager {
@@ -55,7 +41,7 @@ public:
     RenderTextureGroup m_mainIcons;
     RenderTextureGroup m_dualIcons;
     RenderTextureGroup m_mainIconsMainOnly; // for ghost trail
-    Texture2DGroup m_ghostTrailIcons;
+    RenderTextureGroup m_ghostTrailIcons;
 
     std::unordered_map<IconType, IconChoiceInfo> m_icon;
 
@@ -69,10 +55,10 @@ public:
     void init();
     void updateRenderedSprites();
     void updateRenderedSprites(RenderTextureGroup& group, bool dual, bool mainOnly);
-    void updateRenderedTrailSprites(Texture2DGroup& group);
+    void updateRenderedTrailSprites(RenderTextureGroup& group);
     SimplePlayer* createSimplePlayer(IconType gamemode, bool dual);
     void updateRenderedSprite(cocos2d::CCTexture2D* texture, IconType gamemode, bool dual, bool mainOnly);
-    void updateRenderedTrailSprite(geode::Ref<cocos2d::CCTexture2D>& texture, IconType gamemode);
+    void updateRenderedTrailSprite(cocos2d::CCTexture2D* texture, IconType gamemode);
 
     void addMappingTexturesToCache();
     void recreateTextures();

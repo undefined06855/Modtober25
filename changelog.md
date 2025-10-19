@@ -1,4 +1,8 @@
 # ""Icon"" Kit
+## v1.0.7
+- Added iOS support because rendertextures were fixed
+- Fixed ghost trail effect if the player hadn't changed gamemodes yet
+
 ## v1.0.6
 - Fixed small issues with textures on different graphics settings
 

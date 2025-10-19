@@ -5,20 +5,42 @@
 
 // 32 * 4 * 4 = 512
 // icon size * high graphics * 4
-#define RENDERTEXTURE_INIT_PARAMS 512, 512, GL_RGBA, GL_RGBA, GL_LINEAR, GL_CLAMP_TO_EDGE
+#define RENDERTEXTURE_INIT_PARAMS nullptr, cocos2d::kCCTexture2DPixelFormat_RGBA8888, 512, 512, { 512, 512 }
 
 RenderTextureGroup::RenderTextureGroup()
-    : m_cube(RENDERTEXTURE_INIT_PARAMS)
-    , m_ship(RENDERTEXTURE_INIT_PARAMS)
-    , m_ball(RENDERTEXTURE_INIT_PARAMS)
-    , m_ufo(RENDERTEXTURE_INIT_PARAMS)
-    , m_wave(RENDERTEXTURE_INIT_PARAMS)
-    , m_robot(RENDERTEXTURE_INIT_PARAMS)
-    , m_spider(RENDERTEXTURE_INIT_PARAMS)
-    , m_swing(RENDERTEXTURE_INIT_PARAMS)
-    , m_jetpack(RENDERTEXTURE_INIT_PARAMS) {}
+    : m_cube(new cocos2d::CCTexture2D())
+    , m_ship(new cocos2d::CCTexture2D())
+    , m_ball(new cocos2d::CCTexture2D())
+    , m_ufo(new cocos2d::CCTexture2D())
+    , m_wave(new cocos2d::CCTexture2D())
+    , m_robot(new cocos2d::CCTexture2D())
+    , m_spider(new cocos2d::CCTexture2D())
+    , m_swing(new cocos2d::CCTexture2D())
+    , m_jetpack(new cocos2d::CCTexture2D()) {
+        m_cube->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_ship->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_ball->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_ufo->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_wave->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_robot->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_spider->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_swing->initWithData(RENDERTEXTURE_INIT_PARAMS);
+        m_jetpack->initWithData(RENDERTEXTURE_INIT_PARAMS);
+    }
 
-#undef RENDERTEXTURE_IMAGE_PARAMS
+#undef RENDERTEXTURE_INIT_PARAMS
+
+RenderTextureGroup::~RenderTextureGroup() {
+    m_cube->release();
+    m_ship->release();
+    m_ball->release();
+    m_ufo->release();
+    m_wave->release();
+    m_robot->release();
+    m_spider->release();
+    m_swing->release();
+    m_jetpack->release();
+}
 
 Texture2DGroup::Texture2DGroup()
     : m_cube(nullptr)
@@ -55,15 +77,15 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
         // for ghost trail textures
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
-            case FunnySpriteGamemode::Cube: return m_mainIconsMainOnly.m_cube.getTexture();
-            case FunnySpriteGamemode::Ship: return m_mainIconsMainOnly.m_ship.getTexture();
-            case FunnySpriteGamemode::Ball: return m_mainIconsMainOnly.m_ball.getTexture();
-            case FunnySpriteGamemode::Ufo: return m_mainIconsMainOnly.m_ufo.getTexture();
-            case FunnySpriteGamemode::Wave: return m_mainIconsMainOnly.m_wave.getTexture();
-            case FunnySpriteGamemode::Robot: return m_mainIconsMainOnly.m_robot.getTexture();
-            case FunnySpriteGamemode::Spider: return m_mainIconsMainOnly.m_spider.getTexture();
-            case FunnySpriteGamemode::Swing: return m_mainIconsMainOnly.m_swing.getTexture();
-            case FunnySpriteGamemode::Jetpack: return m_mainIconsMainOnly.m_jetpack.getTexture();
+            case FunnySpriteGamemode::Cube: return m_mainIconsMainOnly.m_cube->getName();
+            case FunnySpriteGamemode::Ship: return m_mainIconsMainOnly.m_ship->getName();
+            case FunnySpriteGamemode::Ball: return m_mainIconsMainOnly.m_ball->getName();
+            case FunnySpriteGamemode::Ufo: return m_mainIconsMainOnly.m_ufo->getName();
+            case FunnySpriteGamemode::Wave: return m_mainIconsMainOnly.m_wave->getName();
+            case FunnySpriteGamemode::Robot: return m_mainIconsMainOnly.m_robot->getName();
+            case FunnySpriteGamemode::Spider: return m_mainIconsMainOnly.m_spider->getName();
+            case FunnySpriteGamemode::Swing: return m_mainIconsMainOnly.m_swing->getName();
+            case FunnySpriteGamemode::Jetpack: return m_mainIconsMainOnly.m_jetpack->getName();
             default: return 0;
         }
     }
@@ -71,29 +93,29 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
     if (!dual) {
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
-            case FunnySpriteGamemode::Cube: return m_mainIcons.m_cube.getTexture();
-            case FunnySpriteGamemode::Ship: return m_mainIcons.m_ship.getTexture();
-            case FunnySpriteGamemode::Ball: return m_mainIcons.m_ball.getTexture();
-            case FunnySpriteGamemode::Ufo: return m_mainIcons.m_ufo.getTexture();
-            case FunnySpriteGamemode::Wave: return m_mainIcons.m_wave.getTexture();
-            case FunnySpriteGamemode::Robot: return m_mainIcons.m_robot.getTexture();
-            case FunnySpriteGamemode::Spider: return m_mainIcons.m_spider.getTexture();
-            case FunnySpriteGamemode::Swing: return m_mainIcons.m_swing.getTexture();
-            case FunnySpriteGamemode::Jetpack: return m_mainIcons.m_jetpack.getTexture();
+            case FunnySpriteGamemode::Cube: return m_mainIcons.m_cube->getName();
+            case FunnySpriteGamemode::Ship: return m_mainIcons.m_ship->getName();
+            case FunnySpriteGamemode::Ball: return m_mainIcons.m_ball->getName();
+            case FunnySpriteGamemode::Ufo: return m_mainIcons.m_ufo->getName();
+            case FunnySpriteGamemode::Wave: return m_mainIcons.m_wave->getName();
+            case FunnySpriteGamemode::Robot: return m_mainIcons.m_robot->getName();
+            case FunnySpriteGamemode::Spider: return m_mainIcons.m_spider->getName();
+            case FunnySpriteGamemode::Swing: return m_mainIcons.m_swing->getName();
+            case FunnySpriteGamemode::Jetpack: return m_mainIcons.m_jetpack->getName();
             default: return 0;
         }
     } else {
         switch (gamemode) {
             case FunnySpriteGamemode::VehiclePassenger:
-            case FunnySpriteGamemode::Cube: return m_dualIcons.m_cube.getTexture();
-            case FunnySpriteGamemode::Ship: return m_dualIcons.m_ship.getTexture();
-            case FunnySpriteGamemode::Ball: return m_dualIcons.m_ball.getTexture();
-            case FunnySpriteGamemode::Ufo: return m_dualIcons.m_ufo.getTexture();
-            case FunnySpriteGamemode::Wave: return m_dualIcons.m_wave.getTexture();
-            case FunnySpriteGamemode::Robot: return m_dualIcons.m_robot.getTexture();
-            case FunnySpriteGamemode::Spider: return m_dualIcons.m_spider.getTexture();
-            case FunnySpriteGamemode::Swing: return m_dualIcons.m_swing.getTexture();
-            case FunnySpriteGamemode::Jetpack: return m_dualIcons.m_jetpack.getTexture();
+            case FunnySpriteGamemode::Cube: return m_dualIcons.m_cube->getName();
+            case FunnySpriteGamemode::Ship: return m_dualIcons.m_ship->getName();
+            case FunnySpriteGamemode::Ball: return m_dualIcons.m_ball->getName();
+            case FunnySpriteGamemode::Ufo: return m_dualIcons.m_ufo->getName();
+            case FunnySpriteGamemode::Wave: return m_dualIcons.m_wave->getName();
+            case FunnySpriteGamemode::Robot: return m_dualIcons.m_robot->getName();
+            case FunnySpriteGamemode::Spider: return m_dualIcons.m_spider->getName();
+            case FunnySpriteGamemode::Swing: return m_dualIcons.m_swing->getName();
+            case FunnySpriteGamemode::Jetpack: return m_dualIcons.m_jetpack->getName();
             default: return 0;
         }
     }
@@ -384,7 +406,9 @@ SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dua
     return simplePlayer;
 }
 
-void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, IconType gamemode, bool dual, bool mainOnly) {
+void FunnySpriteManager::updateRenderedSprite(cocos2d::CCTexture2D* texture, IconType gamemode, bool dual, bool mainOnly) {
+    auto renderTexture = RenderTexture(texture);
+
     auto simplePlayer = createSimplePlayer(gamemode, dual);
     auto playerSprite = simplePlayer->getChildByIndex(0);
 
@@ -429,6 +453,12 @@ void FunnySpriteManager::updateRenderedSprite(RenderTexture& renderTexture, Icon
 
     if (mainOnly) {
         playerSprite->removeAllChildren();
+        if (simplePlayer->m_robotSprite) {
+            simplePlayer->m_robotSprite->m_paSprite = nullptr;
+        }
+        if (simplePlayer->m_spiderSprite) {
+            simplePlayer->m_spiderSprite->m_paSprite = nullptr;
+        }
     }
 
     renderTexture.capture(playerSprite);

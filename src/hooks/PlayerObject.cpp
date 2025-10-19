@@ -44,13 +44,14 @@ bool HookedPlayerObject::init(int player, int ship, GJBaseGameLayer* gameLayer, 
     m_mainLayer->addChild(funnyVehicleSprite);
     fields->m_funnyVehicleSprite = funnyVehicleSprite;
 
-    fields->m_currentGamemode = Gamemode::None;
+    fields->m_currentGamemode = Gamemode::Cube;
     fields->m_isDualUpdated = false;
 
     fields->m_showFunnySprite = true;
     fields->m_showFunnyVehicleSprite = false;
 
     updateShitVisibility();
+    updateTrailTexture();
 
     // :(
     geode::Loader::get()->queueInMainThread([self = geode::WeakRef(this)] {
@@ -166,10 +167,13 @@ void HookedPlayerObject::updateFunnySprite() {
         default: break;
     }
 
-    m_iconSprite->setTexture(FunnySpriteManager::get().trailTextureForGamemode(funnySpriteGamemode));
-    m_iconSprite->setTextureRect({ 0.f, 0.f, 32.f, 32.f });
-
+    updateTrailTexture();
     updateShitVisibility();
+}
+
+void HookedPlayerObject::updateTrailTexture() {
+    m_iconSprite->setTexture(FunnySpriteManager::get().trailTextureForGamemode((FunnySpriteGamemode)m_fields->m_currentGamemode));
+    m_iconSprite->setTextureRect({ 0.f, 0.f, 32.f, 32.f });
 }
 
 void HookedPlayerObject::createRobot(int frame) {

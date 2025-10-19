@@ -42,6 +42,7 @@ class $modify(HookedPlayerObject, PlayerObject) {
     void enterGamemode(Gamemode gamemode);
     void exitGamemode(Gamemode gamemode);
 
+    void updateTrailTexture();
     void updateFunnySprite();
 
     void createRobot(int frame);

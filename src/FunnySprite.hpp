@@ -9,7 +9,7 @@ struct GamemodeInfo {
 enum class FunnySpriteGamemode {
     None = -1,
     Cube, Ship, Ball, Ufo, Wave, Robot, Spider, Swing, Jetpack,
-    VehiclePassenger
+    JetpackPassenger, ShipPassenger, UfoPassenger
 };
 
 class FunnySprite : public cocos2d::CCSprite {

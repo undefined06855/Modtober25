@@ -66,7 +66,9 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
     if (mainOnly) {
         // for ghost trail textures
         switch (gamemode) {
-            case FunnySpriteGamemode::VehiclePassenger:
+            case FunnySpriteGamemode::JetpackPassenger:
+            case FunnySpriteGamemode::ShipPassenger:
+            case FunnySpriteGamemode::UfoPassenger:
             case FunnySpriteGamemode::Cube: return m_mainIconsMainOnly.m_cube->getName();
             case FunnySpriteGamemode::Ship: return m_mainIconsMainOnly.m_ship->getName();
             case FunnySpriteGamemode::Ball: return m_mainIconsMainOnly.m_ball->getName();
@@ -82,7 +84,9 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
 
     if (!dual) {
         switch (gamemode) {
-            case FunnySpriteGamemode::VehiclePassenger:
+            case FunnySpriteGamemode::JetpackPassenger:
+            case FunnySpriteGamemode::ShipPassenger:
+            case FunnySpriteGamemode::UfoPassenger:
             case FunnySpriteGamemode::Cube: return m_mainIcons.m_cube->getName();
             case FunnySpriteGamemode::Ship: return m_mainIcons.m_ship->getName();
             case FunnySpriteGamemode::Ball: return m_mainIcons.m_ball->getName();
@@ -96,7 +100,9 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
         }
     } else {
         switch (gamemode) {
-            case FunnySpriteGamemode::VehiclePassenger:
+            case FunnySpriteGamemode::JetpackPassenger:
+            case FunnySpriteGamemode::ShipPassenger:
+            case FunnySpriteGamemode::UfoPassenger:
             case FunnySpriteGamemode::Cube: return m_dualIcons.m_cube->getName();
             case FunnySpriteGamemode::Ship: return m_dualIcons.m_ship->getName();
             case FunnySpriteGamemode::Ball: return m_dualIcons.m_ball->getName();
@@ -114,7 +120,9 @@ GLuint FunnySpriteManager::textureForGamemode(FunnySpriteGamemode gamemode, bool
 GLuint FunnySpriteManager::mappingTextureForGamemode(FunnySpriteGamemode gamemode) {
     auto cache = cocos2d::CCTextureCache::get();
 
-    if (gamemode == FunnySpriteGamemode::VehiclePassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::JetpackPassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::ShipPassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::UfoPassenger) gamemode = FunnySpriteGamemode::Cube;
 
     auto texture = cache->textureForKey(fmt::format("{:04}.png"_spr, fmt::underlying(gamemode) + 1).c_str());
 
@@ -125,7 +133,9 @@ GLuint FunnySpriteManager::mappingTextureForGamemode(FunnySpriteGamemode gamemod
 GLuint FunnySpriteManager::transparencyMaskForGamemode(FunnySpriteGamemode gamemode) {
     auto cache = cocos2d::CCTextureCache::get();
 
-    if (gamemode == FunnySpriteGamemode::VehiclePassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::JetpackPassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::ShipPassenger) gamemode = FunnySpriteGamemode::Cube;
+    if (gamemode == FunnySpriteGamemode::UfoPassenger) gamemode = FunnySpriteGamemode::Cube;
 
     auto texture = cache->textureForKey(fmt::format("{:04}.png"_spr, fmt::underlying(gamemode) + 1 + 9).c_str());
 
@@ -147,7 +157,9 @@ cocos2d::CCTexture2D* FunnySpriteManager::trailTextureForGamemode(FunnySpriteGam
         case FunnySpriteGamemode::Spider: return m_ghostTrailIcons.m_spider;
         case FunnySpriteGamemode::Swing: return m_ghostTrailIcons.m_swing;
         case FunnySpriteGamemode::Jetpack: return m_ghostTrailIcons.m_jetpack;
-        case FunnySpriteGamemode::VehiclePassenger: return nullptr;
+        case FunnySpriteGamemode::JetpackPassenger: return nullptr;
+        case FunnySpriteGamemode::ShipPassenger: return nullptr;
+        case FunnySpriteGamemode::UfoPassenger: return nullptr;
     }
 }
 

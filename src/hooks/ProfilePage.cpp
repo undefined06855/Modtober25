@@ -33,14 +33,6 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
         funnySprite->addLimbs(gamemode);
         wrap->addChild(funnySprite);
 
-        // add passenger for gamemodes that need it
-        if (gamemode == FunnySpriteGamemode::Ship || gamemode == FunnySpriteGamemode::Ufo) {
-            auto passenger = FunnySprite::create();
-            passenger->setID("funny-passenger-sprite");
-            passenger->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
-            wrap->addChild(passenger);
-        }
-
         // for clicking to toggle
         if (gamemode == FunnySpriteGamemode::Ship) {
             fields->m_shipOrJetpack = funnySprite;
@@ -50,13 +42,14 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
 
 void HookedProfilePage::toggleShip(cocos2d::CCObject* sender) {
     ProfilePage::toggleShip(sender);
+    if (!m_ownProfile) return;
 
     auto fields = m_fields.self();
 
     if (fields->m_showingJetpack) {
-        m_fields->m_shipOrJetpack->updateForGamemode(FunnySpriteGamemode::Ship);
+        fields->m_shipOrJetpack->updateForGamemode(FunnySpriteGamemode::Ship);
     } else {
-        m_fields->m_shipOrJetpack->updateForGamemode(FunnySpriteGamemode::Jetpack);
+        fields->m_shipOrJetpack->updateForGamemode(FunnySpriteGamemode::Jetpack);
     }
 
     fields->m_showingJetpack = !fields->m_showingJetpack;

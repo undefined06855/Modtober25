@@ -49,6 +49,8 @@ class $modify(HookedPlayerObject, PlayerObject) {
     void createSpider(int frame);
 
     void playDeathEffect();
+    void playCompleteEffect(bool dontCreateExplosion, bool instant);
+    void playSpawnEffect();
 
     void update(float dt);
 

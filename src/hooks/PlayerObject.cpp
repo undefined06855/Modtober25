@@ -127,6 +127,31 @@ void HookedPlayerObject::playDeathEffect() {
     updateShitVisibility();
 }
 
+void HookedPlayerObject::playCompleteEffect(bool dontCreateExplosion, bool instant) {
+    PlayerObject::playCompleteEffect(dontCreateExplosion, instant);
+    auto fields = m_fields.self();
+
+    if (instant) {
+        fields->m_showFunnySprite = false;
+        fields->m_showFunnyVehicleSprite = false;
+        fields->m_funnyVehicleSprite->m_ufoDome->setOpacity(0);
+    } else {
+        fields->m_funnySprite->runAction(cocos2d::CCFadeOut::create(.1f));
+        fields->m_funnyVehicleSprite->runAction(cocos2d::CCFadeOut::create(.1f));
+        fields->m_funnyVehicleSprite->m_ufoDome->runAction(cocos2d::CCFadeOut::create(.1f));
+    }
+
+    updateShitVisibility();
+}
+
+void HookedPlayerObject::playSpawnEffect() {
+    PlayerObject::playSpawnEffect();
+
+    auto fields = m_fields.self();
+    fields->m_funnySprite->setOpacity(255);
+    fields->m_funnyVehicleSprite->setOpacity(255);
+}
+
 void HookedPlayerObject::updateFunnySprite() {
     if (!shouldDoChanges()) return;
 
@@ -151,7 +176,17 @@ void HookedPlayerObject::updateFunnySprite() {
         case Gamemode::Ship:
         case Gamemode::Ufo: {
             // set sprite to cube (passenger), show vehicle
-            fields->m_funnySprite->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
+            FunnySpriteGamemode passengerGamemode;
+            if (m_isPlatformer && fields->m_currentGamemode == Gamemode::Ship) {
+                passengerGamemode = FunnySpriteGamemode::JetpackPassenger;
+            } else {
+                passengerGamemode =
+                    fields->m_currentGamemode == Gamemode::Ship
+                    ? FunnySpriteGamemode::ShipPassenger
+                    : FunnySpriteGamemode::UfoPassenger;
+            }
+
+            fields->m_funnySprite->updateForGamemode(passengerGamemode);
             fields->m_funnyVehicleSprite->updateForGamemode(funnySpriteGamemode);
             fields->m_showFunnySprite = true;
             fields->m_showFunnyVehicleSprite = true;
@@ -167,12 +202,20 @@ void HookedPlayerObject::updateFunnySprite() {
         default: break;
     }
 
+    // for when restarting the level after finished complete and sprites faded out
+    fields->m_funnySprite->setOpacity(255);
+    fields->m_funnyVehicleSprite->setOpacity(255);
+    fields->m_funnyVehicleSprite->m_ufoDome->setOpacity(255);
+
     updateTrailTexture();
     updateShitVisibility();
 }
 
 void HookedPlayerObject::updateTrailTexture() {
-    m_iconSprite->setTexture(FunnySpriteManager::get().trailTextureForGamemode((FunnySpriteGamemode)m_fields->m_currentGamemode));
+    auto gamemode = (FunnySpriteGamemode)m_fields->m_currentGamemode;
+    if (m_isPlatformer && gamemode == FunnySpriteGamemode::Ship) gamemode = FunnySpriteGamemode::Jetpack;
+
+    m_iconSprite->setTexture(FunnySpriteManager::get().trailTextureForGamemode(gamemode));
     m_iconSprite->setTextureRect({ 0.f, 0.f, 32.f, 32.f });
 }
 
@@ -260,8 +303,18 @@ void HookedPlayerObject::updateShitVisibility() {
         fields->m_funnyVehicleSprite->setRotation(m_vehicleSprite->getRotation());
     }
 
-    if (fields->m_funnyRobotSprite) fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
-    if (fields->m_funnySpiderSprite) fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
+    if (fields->m_funnyRobotSprite) {
+        fields->m_funnyRobotSprite->setColor({ 255, 255, 255 });
+        // this just doesn't work?
+        // fields->m_funnyRobotSprite->setPosition(m_robotSprite->m_headSprite->getPosition());
+        // fields->m_funnyRobotSprite->setRotation(m_robotSprite->m_headSprite->getRotation());
+    }
+
+    if (fields->m_funnySpiderSprite) {
+        fields->m_funnySpiderSprite->setColor({ 255, 255, 255 });
+        // fields->m_funnyRobotSprite->setPosition(m_spiderSprite->m_headSprite->getPosition());
+        // fields->m_funnyRobotSprite->setRotation(m_spiderSprite->m_headSprite->getRotation());
+    }
 
     fields->m_funnySprite->setVisible(!m_isDead && fields->m_showFunnySprite);
     fields->m_funnyVehicleSprite->setVisible(!m_isDead && fields->m_showFunnyVehicleSprite);

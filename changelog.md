@@ -1,4 +1,9 @@
 # ""Icon"" Kit
+## v1.0.8
+- Fixed the player not disappearing with a level end trigger
+- Adjusted offsets of icons slightly and improved mapping sprites
+- Fixed a crash when toggling between ship and jetpack in other people's profiles
+
 ## v1.0.7
 - Added iOS support because rendertextures were fixed
 - Fixed ghost trail effect if the player hadn't changed gamemodes yet

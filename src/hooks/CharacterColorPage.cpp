@@ -44,13 +44,6 @@ bool HookedCharacterColorPage::init() {
         funnySprite->addLimbs(gamemode);
         wrap->addChild(funnySprite);
 
-        if (gamemode == FunnySpriteGamemode::Ufo) {
-            auto passenger = FunnySprite::create();
-            passenger->setID("funny-passenger-sprite");
-            passenger->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
-            wrap->addChild(passenger);
-        }
-
         if (gamemode == FunnySpriteGamemode::Spider) fields->m_spider = funnySprite;
         if (gamemode == FunnySpriteGamemode::Robot) fields->m_robot = funnySprite;
     }
@@ -68,11 +61,6 @@ bool HookedCharacterColorPage::init() {
         funnySprite->updateForGamemode(FunnySpriteGamemode::Ship);
         funnySprite->setZOrder(2);
         wrap->addChild(funnySprite);
-
-        auto passenger = FunnySprite::create();
-        passenger->setID("funny-passenger-sprite");
-        passenger->updateForGamemode(FunnySpriteGamemode::VehiclePassenger);
-        wrap->addChild(passenger);
 
         fields->m_shipOrJetpack = funnySprite;
     }

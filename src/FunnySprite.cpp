@@ -1,5 +1,6 @@
 #include "FunnySprite.hpp"
 #include "FunnySpriteManager.hpp"
+#include <Geode/ui/GeodeUI.hpp>
 
 FunnySprite* FunnySprite::create() {
     auto ret = new FunnySprite;
@@ -46,7 +47,7 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Ship, {
-            .m_scale = 1.15f,
+            .m_scale = 1.3f,
             .m_offset = { 0.f, -3.f }
         } },
         { FunnySpriteGamemode::Ball, {
@@ -54,11 +55,11 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Ufo, {
-            .m_scale = 1.f,
+            .m_scale = 1.07f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Wave, {
-            .m_scale = .9f,
+            .m_scale = .86f,
             .m_offset = { 0.f, 0.f }
         } },
         { FunnySpriteGamemode::Robot, {
@@ -77,10 +78,18 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
             .m_scale = 1.f,
             .m_offset = { 0.f, 0.f }
         } },
-        { FunnySpriteGamemode::VehiclePassenger, {
-            .m_scale = .5f,
+        { FunnySpriteGamemode::JetpackPassenger, {
+            .m_scale = .55f,
             .m_offset = { 0.f, 0.f }
-        } }
+        } },
+        { FunnySpriteGamemode::ShipPassenger, {
+            .m_scale = .6f,
+            .m_offset = { 0.f, 3.f }
+        } },
+        { FunnySpriteGamemode::UfoPassenger, {
+            .m_scale = .45f,
+            .m_offset = { 0.f, 1.5f }
+        } },
     };
 
     if (!gamemodeInfoMap.contains(gamemode)) return;

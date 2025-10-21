@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.9
+- Rerendered mapping sprites at a higher resolution to reduce artifacts
+
 ## v1.0.8
 - Fixed the player not disappearing with a level end trigger
 - Adjusted offsets of icons slightly and improved mapping sprites

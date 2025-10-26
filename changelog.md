@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.11
+- Fixed a missing texture issue with the UFO dome when changing resolutions
+
 ## v1.0.10
 - Added a small warping animations in the icon kit
 - Fixed edges of icons looking grainy

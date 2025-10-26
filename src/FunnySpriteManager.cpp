@@ -173,10 +173,6 @@ void FunnySpriteManager::init() {
     // update rendered sprites (now done in menulayer!!!)
     // updateRenderedSprites();
 
-    // load ufo dome for default ufo so we can use it
-    // third param is used for unloading the icon so should be something gd won't use
-    GameManager::get()->loadIcon(1, (int)IconType::Ufo, 0xb00b1e5);
-
     // get total count for types
     for (int i = fmt::underlying(IconType::Cube); i <= fmt::underlying(IconType::Jetpack); i++) {
         m_totalCountForTypes += realCountForType((IconType)i);
@@ -244,6 +240,10 @@ void FunnySpriteManager::addMappingTexturesToCache() {
     for (int i = 1; i <= 18; i++) {
         cache->addImage(fmt::format("{:04}.png"_spr, i).c_str(), false);
     }
+
+    // load ufo dome for default ufo so we can use it
+    // third param is used for unloading the icon so should be something gd won't use
+    GameManager::get()->loadIcon(1, (int)IconType::Ufo, 0xb00b1e5);
 }
 
 // if there's a better way to do this let me know please!!!

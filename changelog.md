@@ -1,6 +1,7 @@
 # ""Icon"" Kit
 ## v1.0.10
-- Small warping animations in icon kit
+- Added a small warping animations in the icon kit
+- Fixed edges of icons looking grainy
 
 ## v1.0.9
 - Rerendered mapping sprites at a higher resolution to reduce artifacts
@@ -19,7 +20,7 @@
 
 ## v1.0.5
 - Fixed death effects on other players crashing the game
-- Chroma Icons detection and disablation
+- Added Chroma Icons detection and disablation
 
 ## v1.0.4
 - Fixed the player being visible when you die

@@ -25,13 +25,22 @@ public:
     GLuint m_currentTransparencyTexture;
     FunnySpriteGamemode m_currentGamemode;
 
+    bool m_isAnimating;
+    float m_animationPercentage;
+    GLuint m_animatedMappingTexture;
+    GLuint m_animatedTransparencyTexture;
+    FunnySpriteGamemode m_animatedGamemode;
+
     std::vector<cocos2d::CCNode*> m_limbs;
     cocos2d::CCSprite* m_ufoDome;
 
     void updateTextures();
-    void updateForGamemode(FunnySpriteGamemode gamemode);
+    void updateForGamemode(FunnySpriteGamemode gamemode, bool animate = false);
+
+    void animateToGamemode(FunnySpriteGamemode gamemode);
 
     void addLimbs(FunnySpriteGamemode gamemode);
 
     void draw();
+    void update(float dt);
 };

@@ -143,7 +143,8 @@ void HookedGJGarageLayer::onSelect(cocos2d::CCObject* sender) {
         // more icons icon
         GJGarageLayer::onSelect(sender);
         FunnySpriteManager::get().updateRenderedSprites();
-        fields->m_player->updateForGamemode((FunnySpriteGamemode)m_iconType);
+        fields->m_player->updateForGamemode(FunnySpriteGamemode::Cube);
+        fields->m_player->animateToGamemode((FunnySpriteGamemode)m_iconType);
         fields->m_player->addLimbs((FunnySpriteGamemode)m_iconType);
         return;
     }
@@ -165,7 +166,8 @@ void HookedGJGarageLayer::onSelect(cocos2d::CCObject* sender) {
     fsm.updateRenderedSprites();
     fsm.saveIconChoice();
 
-    fields->m_player->updateForGamemode((FunnySpriteGamemode)m_iconType);
+    fields->m_player->updateForGamemode(FunnySpriteGamemode::Cube);
+    fields->m_player->animateToGamemode((FunnySpriteGamemode)m_iconType);
     fields->m_player->addLimbs((FunnySpriteGamemode)m_iconType);
 
     GameManager::get()->m_playerIconType = m_iconType;

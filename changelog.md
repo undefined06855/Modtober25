@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.10
+- Small warping animations in icon kit
+
 ## v1.0.9
 - Rerendered mapping sprites at a higher resolution to reduce artifacts
 

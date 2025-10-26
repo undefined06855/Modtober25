@@ -19,13 +19,18 @@ bool FunnySprite::init() {
     m_currentTexture = 0;
     m_currentMappingTexture = 0;
     m_currentTransparencyTexture = 0;
+    m_currentGamemode = FunnySpriteGamemode::None;
 
     m_dual = false;
     m_mainOnly = false;
 
     m_limbs = {};
 
-    m_currentGamemode = FunnySpriteGamemode::None;
+    m_animatedMappingTexture = 0;
+    m_animatedTransparencyTexture = 0;
+    m_isAnimating = false;
+    m_animationPercentage = 0.f;
+    m_animatedGamemode = FunnySpriteGamemode::None;
 
     m_ufoDome = cocos2d::CCSprite::createWithSpriteFrameName("bird_01_3_001.png");
     m_ufoDome->setID("dome");
@@ -37,10 +42,12 @@ bool FunnySprite::init() {
 
     setShaderProgram(FunnySpriteManager::get().getMappingShader());
 
+    scheduleUpdate();
+
     return true;
 }
 
-void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
+void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode, bool animate) {
     static const std::unordered_map<FunnySpriteGamemode, GamemodeInfo> gamemodeInfoMap = {
         { FunnySpriteGamemode::Cube, {
             .m_scale = 1.f,
@@ -96,9 +103,16 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
 
     auto& gamemodeInfo = gamemodeInfoMap.at(gamemode);
 
-    m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode, m_dual, m_mainOnly);
-    m_currentMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
-    m_currentTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
+    auto& fsm = FunnySpriteManager::get();
+
+    if (animate && m_currentMappingTexture != fsm.mappingTextureForGamemode(gamemode)) {
+        animateToGamemode(gamemode);
+    } else {
+        m_currentMappingTexture = fsm.mappingTextureForGamemode(gamemode);
+        m_currentTransparencyTexture = fsm.transparencyMaskForGamemode(gamemode);
+    }
+
+    m_currentTexture = fsm.textureForGamemode(gamemode, m_dual, m_mainOnly);
 
     m_ufoDome->setVisible(gamemode == FunnySpriteGamemode::Ufo && !m_mainOnly);
 
@@ -110,6 +124,21 @@ void FunnySprite::updateForGamemode(FunnySpriteGamemode gamemode) {
     setAdditionalTransform(transform);
 
     m_currentGamemode = gamemode;
+
+    // need a better blend func, aa looks weird but whatever this is good enough
+    auto blendFunc = cocos2d::ccBlendFunc{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
+    setBlendFunc(blendFunc);
+}
+
+void FunnySprite::animateToGamemode(FunnySpriteGamemode gamemode) {
+    m_animatedGamemode = gamemode;
+    m_animatedMappingTexture = FunnySpriteManager::get().mappingTextureForGamemode(gamemode);
+    m_animatedTransparencyTexture = FunnySpriteManager::get().transparencyMaskForGamemode(gamemode);
+
+    m_currentTexture = FunnySpriteManager::get().textureForGamemode(gamemode, m_dual, m_mainOnly);
+
+    if (!m_isAnimating) m_animationPercentage = 0.f;
+    m_isAnimating = true;
 }
 
 // violence subroutine
@@ -178,6 +207,10 @@ void FunnySprite::draw() {
     cocos2d::ccGLBindTexture2DN(0, m_currentTexture);
     cocos2d::ccGLBindTexture2DN(1, m_currentMappingTexture);
     cocos2d::ccGLBindTexture2DN(2, m_currentTransparencyTexture);
+    cocos2d::ccGLBindTexture2DN(3, m_animatedMappingTexture);
+    cocos2d::ccGLBindTexture2DN(4, m_animatedTransparencyTexture);
+
+    m_pShaderProgram->setUniformLocationWith1f(m_pShaderProgram->getUniformLocationForName("u_animationPercentage"), m_animationPercentage);
 
     cocos2d::ccGLEnableVertexAttribs(cocos2d::kCCVertexAttribFlag_PosColorTex);
 
@@ -196,4 +229,21 @@ void FunnySprite::draw() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     *getNumberOfDraws() += 1;
+}
+
+void FunnySprite::update(float dt) {
+    if (!m_isAnimating) return;
+
+    static const float animationRate = 1.f / .2f; // 0.2 seconds
+
+    m_animationPercentage += dt * animationRate;
+
+    if (m_animationPercentage >= 1.f) {
+        m_isAnimating = false;
+        m_animationPercentage = 1.f;
+
+        m_currentGamemode = m_animatedGamemode;
+        m_currentMappingTexture = m_animatedMappingTexture;
+        m_currentTransparencyTexture = m_animatedTransparencyTexture;
+    }
 }

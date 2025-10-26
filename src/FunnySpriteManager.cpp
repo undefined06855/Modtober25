@@ -286,8 +286,11 @@ cocos2d::CCGLProgram* FunnySpriteManager::getMappingShader() {
     mappingShader->link();
     mappingShader->updateUniforms();
 
-    mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture1"), 1);
-    mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName("CC_Texture2"), 2);
+    // add uniforms for textures
+    for (int i = 1; i <= 16; i++) {
+        auto uniform = fmt::format("CC_Texture{}", i);
+        mappingShader->setUniformLocationWith1i(mappingShader->getUniformLocationForName(uniform.c_str()), i);
+    }
 
     cocos2d::CCShaderCache::sharedShaderCache()->addProgram(mappingShader, "mapping_shader"_spr);
 

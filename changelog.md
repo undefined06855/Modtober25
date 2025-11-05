@@ -1,4 +1,8 @@
 # ""Icon"" Kit
+## v1.0.12
+- Fixed grain in the mapping textures
+- Added link to mod description and mod homepage about how I made the mod
+
 ## v1.0.11
 - Fixed a missing texture issue with the UFO dome when changing resolutions
 

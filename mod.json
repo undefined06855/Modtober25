@@ -7,7 +7,7 @@
         "ios": "2.2074"
     },
 
-    "version": "v1.0.11",
+    "version": "v1.0.12",
     "id": "undefined0.icon-kit",
     "name": "\"\"Icon\"\" Kit",
     "developer": "undefined0",
@@ -22,7 +22,8 @@
     },
 
     "links": {
-        "source": "https://github.com/undefined06855/Modtober25"
+        "source": "https://github.com/undefined06855/Modtober25",
+        "homepage": "https://icon-kit.undefined0.dev/"
     },
 
     "dependencies": {

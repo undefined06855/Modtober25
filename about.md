@@ -11,6 +11,7 @@ icons for ball, scaling up waves for cube and so on which can lead to some
 certainly breathtaking, beautiful, gorgeous, attractive, pretty, prepossessing,
 charming, delightful, beautiful, alluring results depending on what you choose!
 
+Read about how I made the mod [here](https://icon-kit.undefined0.dev/)!
 
 Mod support:
 - More Icons: Complete (slightly buggy) support!

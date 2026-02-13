@@ -1,4 +1,7 @@
 # ""Icon"" Kit
+## v1.0.13
+- Geode v5 and GD 2.2081 support!
+
 ## v1.0.12
 - Fixed grain in the mapping textures
 - Added link to mod description and mod homepage about how I made the mod

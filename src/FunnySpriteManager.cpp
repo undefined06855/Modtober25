@@ -373,8 +373,8 @@ SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dua
         simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, simplePlayerType);
     }
 
-    if (MoreIcons::loaded()) {
-        MoreIcons::updateSimplePlayer(simplePlayer, gamemode, dual);
+    if (geode::Loader::get()->isModLoaded("hiimjustin000.more_icons")) {
+        more_icons::updateSimplePlayer(simplePlayer, gamemode, dual);
     }
 
     if (!dual) {

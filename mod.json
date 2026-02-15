@@ -38,7 +38,7 @@
     "incompatibilities": {
         "saritahhh.icon_preview": {
             "version": "v1.0.0",
-            "importance": "breaking"
+            "breaking": true
         }
     }
 }

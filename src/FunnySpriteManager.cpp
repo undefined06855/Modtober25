@@ -1,5 +1,6 @@
 #include "FunnySpriteManager.hpp"
 #include "shaders.hpp"
+#define MORE_ICONS_EVENTS
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 #include <Geode/utils/coro.hpp>
 

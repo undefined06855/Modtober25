@@ -36,6 +36,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: hiimjasmine00/download-geode-dependency@main
+        with:
+          repository: hiimjasmine00/MoreIcons
+          workflow: build.yml
+          branch: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:

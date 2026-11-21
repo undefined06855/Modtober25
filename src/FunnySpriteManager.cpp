@@ -1,7 +1,5 @@
 #include "FunnySpriteManager.hpp"
 #include "shaders.hpp"
-#define MORE_ICONS_EVENTS
-#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 #include <Geode/utils/coro.hpp>
 
 // 32 * 4 * 4 = 512
@@ -372,10 +370,6 @@ SimplePlayer* FunnySpriteManager::createSimplePlayer(IconType gamemode, bool dua
         simplePlayer->updatePlayerFrame(mod->getSavedValue<int64_t>(settingName, m_icon[gamemode].m_index), simplePlayerType);
     } else {
         simplePlayer->updatePlayerFrame(m_icon[gamemode].m_index, simplePlayerType);
-    }
-
-    if (geode::Loader::get()->isModLoaded("hiimjustin000.more_icons")) {
-        more_icons::updateSimplePlayer(simplePlayer, gamemode, dual);
     }
 
     if (!dual) {

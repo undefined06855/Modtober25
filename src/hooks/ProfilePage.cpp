@@ -8,11 +8,6 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
     auto menu = m_mainLayer->getChildByID("player-menu");
     if (!menu) return;
 
-    auto fields = m_fields.self();
-
-    fields->m_shipOrJetpack = nullptr;
-    fields->m_showingJetpack = false;
-
     for (int i = 0; i < menu->getChildrenCount(); i++) {
         auto child = menu->getChildByIndex(i);
         for (auto childchild : child->getChildrenExt()) {
@@ -32,25 +27,5 @@ void HookedProfilePage::loadPageFromUserInfo(GJUserScore* info) {
         funnySprite->setZOrder(2);
         funnySprite->addLimbs(gamemode);
         wrap->addChild(funnySprite);
-
-        // for clicking to toggle
-        if (gamemode == FunnySpriteGamemode::Ship) {
-            fields->m_shipOrJetpack = funnySprite;
-        }
     }
-}
-
-void HookedProfilePage::toggleShip(cocos2d::CCObject* sender) {
-    ProfilePage::toggleShip(sender);
-    if (!m_ownProfile) return;
-
-    auto fields = m_fields.self();
-
-    if (fields->m_showingJetpack) {
-        fields->m_shipOrJetpack->updateForGamemode(FunnySpriteGamemode::Ship);
-    } else {
-        fields->m_shipOrJetpack->updateForGamemode(FunnySpriteGamemode::Jetpack);
-    }
-
-    fields->m_showingJetpack = !fields->m_showingJetpack;
 }

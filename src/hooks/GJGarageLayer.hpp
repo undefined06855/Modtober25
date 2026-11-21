@@ -9,7 +9,10 @@ class $modify(HookedGJGarageLayer, GJGarageLayer) {
         bool m_initializing;
     };
 
-    static void onModify(auto& self);
+    static void onModify(auto& self) {
+        (void)self.setHookPriorityBeforePre("GJGarageLayer::onSelect", "hiimjustin000.more_icons");
+        (void)self.setHookPriorityAfterPost("GJGarageLayer::init", "weebify.separate_dual_icons");
+    }
 
     bool init();
 

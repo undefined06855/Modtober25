@@ -1,11 +1,6 @@
 #include "GJGarageLayer.hpp"
 #include "../FunnySpriteManager.hpp"
 
-void HookedGJGarageLayer::onModify(auto& self) {
-    (void)self.setHookPriorityBeforePre("GJGarageLayer::onSelect", "hiimjustin000.more_icons");
-    (void)self.setHookPriorityAfterPost("GJGarageLayer::init", "weebify.separate_dual_icons");
-}
-
 bool HookedGJGarageLayer::init() {
     auto fields = m_fields.self();
     fields->m_initializing = true;
